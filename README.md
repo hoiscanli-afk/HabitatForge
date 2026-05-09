@@ -59,7 +59,7 @@ Connectors use exact-fit tolerance (no added clearance — designed for tight fi
 |-----------|------|
 | Panel | 110 × 3 × 110 mm |
 | Grid step (STEP) | 120 mm |
-| Connector | 32 × 32 × 3 mm (double piece, 3mm gap) |
+| Connector | See `.scad` files for exact geometry |
 
 ---
 
