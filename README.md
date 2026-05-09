@@ -4,7 +4,7 @@
 Drag, drop, and design multi-level hamster habitats. Export panel lists and print connectors directly.
 
 > Built by a geology engineer with no prior web dev experience — using AI as a collaborator.  
-> This project is proof that domain knowledge + curiosity + AI = real, usable tools.
+> A geologist who asked AI a lot of questions until something worked.
 
 ---
 
@@ -67,7 +67,7 @@ Connectors use exact-fit tolerance (no added clearance — designed for tight fi
 
 I'm a geologist, not a developer. I used [Claude](https://claude.ai) as my AI pair-programmer — describing what I wanted, understanding how it worked, iterating until it felt right. Every feature in this tool came from a real problem I faced while designing habitats for a 10-year-old.
 
-This is what AI-assisted making looks like from the outside of the tech industry.
+I have no idea what half the code does. But it works, and a kid is happy. So here we are.
 
 ---
 
