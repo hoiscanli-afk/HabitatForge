@@ -2,7 +2,7 @@
 
 **A browser-based modular hamster habitat designer — no installation needed.**
 
-🔴 **[Live Demo → hoiscanli-afk.github.io/HabitatForge](https://hoiscanli-afk.github.io/HabitatForge/)**  
+🔴 **[Live Demo → hoiscanli-afk.github.io/HabitatForgeForHamsters](https://hoiscanli-afk.github.io/HabitatForgeForHamsters/)**  
 Drag, drop, and design multi-level hamster habitats. Export panel lists and print connectors directly.
 
 > Built by a geology engineer with no prior web dev experience — using AI as a collaborator.  
