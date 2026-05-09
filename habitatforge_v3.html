@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>HabitatForge Studio v3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;
+  display:flex;height:100vh;overflow:hidden;user-select:none}
+#viewport{flex:1;position:relative;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+
+#sidebar{width:210px;background:#161b22;border-left:1px solid #21262d;
+  display:flex;flex-direction:column;padding:12px;gap:8px;flex-shrink:0;overflow-y:auto}
+
+.logo{font-size:13px;font-weight:bold;letter-spacing:4px;margin-bottom:2px;
+  border-bottom:1px solid #21262d;padding-bottom:8px;display:flex;align-items:baseline;gap:6px}
+.logo-h{color:#f72585}
+.logo-f{color:#4895ef}
+.gun-badge{font-size:7px;letter-spacing:2px;color:#ff6b35;border:1px solid #ff6b35;
+  padding:1px 4px;margin-left:auto;align-self:center;flex-shrink:0}
+.logo .ver{font-size:8px;color:#484f58;letter-spacing:1px}
+
+.sec{border:1px solid #21262d;padding:8px 10px}
+.sec-t{font-size:8px;letter-spacing:2px;color:#484f58;margin-bottom:6px}
+
+/* Kat kontrolü */
+.floor-ctrl{display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.floor-btn{width:30px;height:30px;background:transparent;border:1px solid #21262d;
+  color:#c9d1d9;font-family:inherit;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s}
+.floor-btn:hover{border-color:#ffd166;color:#ffd166}
+.floor-num{flex:1;text-align:center;font-size:18px;font-weight:bold;color:#ffd166;
+  border:1px solid #21262d;padding:3px;letter-spacing:2px;line-height:1.4}
+.floor-lbl{font-size:8px;color:#484f58;text-align:center;margin-bottom:2px}
+
+/* Yön seçimi */
+.axrow{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.axbtn{padding:5px 2px;background:transparent;border:1px solid #21262d;
+  color:#484f58;font-family:inherit;font-size:8px;letter-spacing:1px;
+  cursor:pointer;text-align:center;transition:all .1s}
+.axbtn:hover{border-color:#6699ff;color:#6699ff}
+.axbtn.active{border-color:#6699ff;color:#6699ff;background:rgba(102,153,255,.1)}
+
+/* Panel tipi */
+.pbtn{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid #21262d;
+  background:transparent;color:#c9d1d9;font-family:inherit;font-size:10px;letter-spacing:1px;
+  cursor:pointer;width:100%;margin-bottom:3px;transition:all .1s;text-align:left}
+.pbtn:last-child{margin-bottom:0}
+.pbtn.active{border-color:#ffd166;color:#ffd166;background:rgba(255,209,102,.06)}
+.pdot{width:9px;height:9px;flex-shrink:0;border-radius:2px}
+
+/* BOM */
+.brow{display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;padding:2px 0;border-bottom:1px solid #21262d}
+.brow:last-child{border-bottom:none}
+.bval{font-size:12px;font-weight:bold;color:#ffd166}
+.bsec{font-size:8px;letter-spacing:2px;color:#484f58;padding:4px 0 2px}
+
+/* Kamera preset */
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px}
+.vbtn{padding:5px 2px;background:transparent;border:1px solid #21262d;
+  color:#484f58;font-family:inherit;font-size:9px;letter-spacing:1px;
+  cursor:pointer;transition:all .1s;text-align:center}
+.vbtn:hover{border-color:#6699ff;color:#6699ff}
+
+/* Renk paleti */
+.cpal{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
+.csw{width:22px;height:22px;border-radius:3px;cursor:pointer;border:2px solid transparent;
+  font-size:5px;letter-spacing:.5px;color:#fff;display:flex;align-items:center;
+  justify-content:center;transition:all .12s;flex-shrink:0}
+.csw:hover{transform:scale(1.18);border-color:#fff !important}
+.csw.active{border-color:#fff !important;box-shadow:0 0 6px rgba(255,255,255,.5)}
+.cbtn{width:100%;padding:4px;background:transparent;border:1px solid #21262d;
+  color:#484f58;font-family:inherit;font-size:8px;letter-spacing:1px;cursor:pointer;
+  transition:all .1s;margin-top:2px}
+.cbtn:hover{border-color:#f72585;color:#f72585}
+
+/* Resizer */
+#resizer{width:5px;background:#21262d;cursor:col-resize;flex-shrink:0;transition:background .15s}
+#resizer:hover{background:#3ddc84}
+#resizer:active{background:#3ddc84}
+
+/* Alt butonlar */
+.btns-row{display:flex;gap:4px;margin-top:auto}
+.clearbtn{padding:7px;background:transparent;border:1px solid rgba(239,71,111,.3);
+  color:#ef476f;font-family:inherit;font-size:8px;letter-spacing:1px;
+  cursor:pointer;flex:1;transition:all .1s}
+.clearbtn:hover{background:rgba(239,71,111,.1)}
+.viewbtn{padding:7px;background:transparent;border:1px solid rgba(61,220,132,.3);
+  color:#3ddc84;font-family:inherit;font-size:8px;letter-spacing:1px;
+  cursor:pointer;flex:1;transition:all .1s}
+.viewbtn:hover{background:rgba(61,220,132,.1)}
+
+/* Viewport overlay */
+#hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:1px;color:#484f58;background:#161b22;
+  border:1px solid #21262d;padding:4px 14px;pointer-events:none;white-space:nowrap}
+#status{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:2px;
+  padding:3px 8px;border:1px solid;pointer-events:none;transition:all .2s}
+#info-overlay{position:absolute;top:10px;left:10px;font-size:9px;letter-spacing:1px;
+  color:#aaa;background:#161b22;border:1px solid #21262d;
+  padding:5px 12px;pointer-events:none;line-height:1.9}
+#exit-view{position:absolute;top:10px;right:10px;display:none;
+  padding:5px 14px;background:#161b22;border:1px solid #3ddc84;color:#3ddc84;
+  font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;z-index:10}
+#boru-warn{position:absolute;bottom:10px;left:10px;display:none;
+  padding:4px 10px;background:#161b22;border:1px solid #ef476f;color:#ef476f;
+  font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;
+  cursor:pointer;z-index:10;transition:opacity .2s}
+#boru-warn:hover{background:rgba(239,71,111,.1)}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <canvas id="c"></canvas>
+  <div id="hint">Sol klik: panel · R: yon · [/]: kat · M: ara mod · Sag sur: dondur · Orta: kaydir · F: izleme</div>
+  <div id="status">HAZIR</div>
+  <div id="info-overlay">
+    KAT: <span id="io-floor" style="color:#ffd166;font-weight:bold">0</span>
+    &nbsp;·&nbsp;
+    YON: <span id="io-axis" style="color:#6699ff">DUV-X</span><br>
+    TIP: <span id="io-type" style="color:#c9d1d9">DUZ</span>
+    &nbsp;·&nbsp;
+    <span id="io-ara" style="color:#484f58">ARA:OFF</span>
+  </div>
+  <button id="exit-view" onclick="toggleView()">✕ KAPAT</button>
+  <div id="boru-warn">⚠ BORU EŞLEŞMİYOR</div>
+</div>
+
+<div id="resizer"></div>
+<div id="sidebar">
+  <div class="logo">
+    <span class="logo-h">HABITAT</span><span class="logo-f">FORGE</span><span class="ver">v3</span>
+  </div>
+
+  <!-- FİLAMAN RENGİ -->
+  <div class="sec">
+    <div class="sec-t">FİLAMAN RENGİ</div>
+    <div class="cpal" id="cpal">
+      <div class="csw active" data-col="auto" title="Tip rengi (otomatik)" style="background:linear-gradient(135deg,#4466cc,#ff4444,#3ddc84,#ffd166);border-color:#484f58">AUTO</div>
+    </div>
+    <button class="cbtn" id="btn-ozel">+ ÖZEL RENK</button>
+    <input type="color" id="custom-col-input" style="display:none">
+  </div>
+
+  <!-- KAT -->
+  <div class="sec">
+    <div class="sec-t">AKTIF KAT</div>
+    <div class="floor-lbl">YUK. / ASAGI</div>
+    <div class="floor-ctrl">
+      <button class="floor-btn" id="fl-up">▲</button>
+      <div class="floor-num" id="fl-num">0</div>
+      <button class="floor-btn" id="fl-dn">▼</button>
+    </div>
+
+    <div class="sec-t">PANEL YONU &nbsp;<span style="color:#21262d">( R )</span></div>
+    <div class="axrow">
+      <button class="axbtn active" data-axis="x">DUV-X</button>
+      <button class="axbtn" data-axis="z">DUV-Z</button>
+      <button class="axbtn" data-axis="tavan">TAVAN</button>
+      <button class="axbtn" data-axis="taban">TABAN</button>
+    </div>
+    <button class="axbtn" id="btn-ara" style="width:100%;margin-top:5px;color:#484f58">ARA MOD: KAPALI &nbsp;<span style="color:#21262d">( M )</span></button>
+  </div>
+
+  <!-- KAMERA -->
+  <div class="sec">
+    <div class="sec-t">KAMERA</div>
+    <div class="vgrid">
+      <button class="vbtn" data-view="iso">ISO</button>
+      <button class="vbtn" data-view="top">UST</button>
+      <button class="vbtn" data-view="front">ON</button>
+      <button class="vbtn" data-view="right">SAG</button>
+    </div>
+    <div style="font-size:8px;color:#484f58;margin-top:7px;line-height:1.9">
+      R &nbsp;·&nbsp; yon degistir<br>
+      [ / ] &nbsp;·&nbsp; kat yukari / asagi<br>
+      M &nbsp;·&nbsp; ara panel modu<br>
+      Sol klik &nbsp;·&nbsp; panel koy/sil<br>
+      Sag sur &nbsp;·&nbsp; dondur<br>
+      Orta sur &nbsp;·&nbsp; kaydir<br>
+      F &nbsp;·&nbsp; izleme modu
+    </div>
+  </div>
+
+  <!-- PANEL TIPI -->
+  <div class="sec">
+    <div class="sec-t">PANEL TIPI</div>
+    <button class="pbtn active" data-type="duz">
+      <div class="pdot" style="background:#4466cc55;border:1px solid #4466cc"></div>DUZ
+    </button>
+    <button class="pbtn" data-type="parmaklik">
+      <div class="pdot" style="background:#3ddc8455;border:1px solid #3ddc84"></div>PARMAKLIKLI
+    </button>
+    <button class="pbtn" data-type="yari">
+      <div class="pdot" style="background:#9966cc55;border:1px solid #9966cc"></div>YARI PARMAKLIK
+    </button>
+    <button class="pbtn" data-type="kapi">
+      <div class="pdot" style="background:#ffd16655;border:1px solid #ffd166"></div>KAPI
+    </button>
+    <button class="pbtn" data-type="tunel">
+      <div class="pdot" style="background:#ff444455;border:1px solid #ff4444"></div>TUNEL GIRISI
+    </button>
+    <button class="pbtn" data-type="yari_kapi">
+      <div class="pdot" style="background:#ff8c0055;border:1px solid #ff8c00"></div>YARI KAPI
+    </button>
+    <button class="pbtn" data-type="suluk">
+      <div class="pdot" style="background:#00c8ff55;border:1px solid #00c8ff"></div>SULUK/YEM
+    </button>
+    <button class="pbtn" data-type="boru">
+      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900"></div>BORU
+    </button>
+    <button class="pbtn" data-type="kafes_boru">
+      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900;border-radius:50%"></div>K.BORU
+    </button>
+  </div>
+
+  <!-- BOM -->
+  <div class="sec" style="flex:1;overflow-y:auto;min-height:0">
+    <div class="sec-t">PARCA LISTESI</div>
+    <div class="bsec">PANELLER</div>
+    <div class="brow"><span>Düz</span><span class="bval" id="b-duz">0</span></div>
+    <div class="brow"><span>Parmaklıklı</span><span class="bval" id="b-par">0</span></div>
+    <div class="brow"><span>Yarı</span><span class="bval" id="b-yar">0</span></div>
+    <div class="brow"><span>Ara Panel</span><span class="bval" id="b-ara">0</span></div>
+    <div class="brow"><span>Kapı</span><span class="bval" id="b-kap">0</span></div>
+    <div class="brow"><span>Tunel</span><span class="bval" id="b-tun">0</span></div>
+    <div class="brow"><span>Yarı Kapı</span><span class="bval" id="b-ykap">0</span></div>
+    <div class="brow"><span>Suluk/Yem</span><span class="bval" id="b-sul">0</span></div>
+    <div class="brow"><span>Boru</span><span class="bval" id="b-bor">0</span></div>
+    <div class="brow"><span>K.Boru</span><span class="bval" id="b-kbor">0</span></div>
+    <div class="bsec">BAGLANTILAR</div>
+    <div class="brow"><span>Son (1 kol)</span><span class="bval" id="b-c1">0</span></div>
+    <div class="brow"><span>Iki kol</span><span class="bval" id="b-c2">0</span></div>
+    <div class="brow"><span>T (3 kol)</span><span class="bval" id="b-c3">0</span></div>
+    <div class="brow"><span>+ (4 kol)</span><span class="bval" id="b-c4">0</span></div>
+    <div class="brow"><span>5+ kol</span><span class="bval" id="b-c5">0</span></div>
+    <div class="brow" style="margin-top:4px;padding-top:4px;border-top:1px solid #21262d">
+      <span style="font-weight:bold">TOP. PANEL</span>
+      <span class="bval" id="b-tot">0</span>
+    </div>
+    <div class="brow">
+      <span style="font-weight:bold">TOP. BAGLANTI</span>
+      <span class="bval" id="b-ctot">0</span>
+    </div>
+  </div>
+
+  <div class="btns-row" style="margin-bottom:4px">
+    <button class="viewbtn" id="btn-save" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8659; KAYDET</button>
+    <button class="viewbtn" id="btn-load" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8657; YÜKLE</button>
+  </div>
+  <div class="btns-row">
+    <button class="viewbtn" onclick="toggleView()">&#9654; IZLE</button>
+    <button class="clearbtn" id="btn-clear">&#9888; TEMIZLE</button>
+  </div>
+  <input type="file" id="load-input" accept=".json" style="display:none">
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── SABİTLER
+var STEP   = 120;  // mm cinsinden yatay grid adımı
+var STEP_V = 60;   // dikey grid adımı (yarım kat = 55mm panel için)
+var PSZ    = 108;  // panel kenar boyu mm
+var PT     = 3;    // panel kalınlığı mm (veri/connector için)
+var VPT    = 10;   // görsel panel kalınlığı (sadece render)
+var CSZ    = 11;   // connector küre yarıçapı
+var GRID_N = 20;   // 19 segment × 120 = 2280 mm ≈ 2.3 m
+
+function off(){ return -((GRID_N-1)*STEP)/2; }
+function offV(){ return -((GRID_N-1)*STEP_V)/2; }
+
+// ── VERİ (panel depolar)
+var sx={}, sy={}, sz={};
+var boru={};       // key="px_py_pz", val='x'|'y'|'z'
+var boruClr={};    // key="px_py_pz", val hex renk
+var boruStyle={};  // key="px_py_pz", val='boru'|'kafes_boru'
+var boruDir='x';
+var selBoruStyle='boru'; // 'boru' | 'kafes_boru'
+function sk(a,b,c){ return a+'_'+b+'_'+c; }
+// hit → fiziksel junction indeksleri (her yön için STEP birimi)
+function hitToPhys(h){
+  if(h.dir==='x') return [h.jx+1, h.jy,   h.jz  ];
+  if(h.dir==='z') return [h.jx,   h.jy,   h.jz+1];
+                  return [h.jx,   h.jy+1, h.jz  ];
+}
+function getBoru(h){ var p=hitToPhys(h); return boru[sk(p[0],p[1],p[2])]||null; }
+function setBoru(h,v){
+  var p=hitToPhys(h), k=sk(p[0],p[1],p[2]);
+  if(v){ boru[k]=h.dir; boruClr[k]=(selColor!==null?selColor:0xff9900); boruStyle[k]=selBoruStyle; }
+  else { delete boru[k]; delete boruClr[k]; delete boruStyle[k]; }
+}
+function isTunel(t){ return !!(t && t.indexOf('tunel')===0); }
+function canPlaceBoru(h){
+  if(h.dir==='x') return isTunel(getX(h.jx,h.jy,h.jz))||isTunel(getX(h.jx+1,h.jy,h.jz));
+  if(h.dir==='z') return isTunel(getZ(h.jx,h.jy,h.jz))||isTunel(getZ(h.jx,h.jy,h.jz+1));
+  return isTunel(getY(h.jx,h.jy,h.jz))||isTunel(getY(h.jx,h.jy+1,h.jz));
+}
+function boruPos(h){
+  var O=off(), p=hitToPhys(h);
+  return [O+p[0]*STEP, O+p[1]*STEP, O+p[2]*STEP];
+}
+// ── FİLAMAN RENKLERİ
+var FILAMENT = [
+  {n:'Beyaz',  h:0xf2f2f0, c:'#f2f2f0'}, {n:'Gri',    h:0x888899, c:'#888899'},
+  {n:'Siyah',  h:0x1a1c22, c:'#1a1c22'}, {n:'Krem',   h:0xf5deb3, c:'#f5deb3'},
+  {n:'Kırmızı',h:0xe63946, c:'#e63946'}, {n:'Turuncu',h:0xff6b35, c:'#ff6b35'},
+  {n:'Sarı',   h:0xffd166, c:'#ffd166'}, {n:'Lime',   h:0xaadd00, c:'#aadd00'},
+  {n:'Yeşil',  h:0x06d6a0, c:'#06d6a0'}, {n:'Turkuaz',h:0x00b4d8, c:'#00b4d8'},
+  {n:'Mavi',   h:0x4361ee, c:'#4361ee'}, {n:'Mor',    h:0x9b5de5, c:'#9b5de5'},
+  {n:'Pembe',  h:0xf72585, c:'#f72585'}, {n:'Kahve',  h:0x8b5e3c, c:'#8b5e3c'},
+];
+var selColor = null;   // null = tip rengi, int = override hex
+var sxClr={}, syClr={}, szClr={};
+function getPClr(h){ return h.axis==='x'?sxClr[sk(h.jx,h.jy,h.jz)]:h.axis==='y'?syClr[sk(h.jx,h.jy,h.jz)]:szClr[sk(h.jx,h.jy,h.jz)]; }
+function setPClr(h,c){ if(h.axis==='x') sxClr[sk(h.jx,h.jy,h.jz)]=c; else if(h.axis==='y') syClr[sk(h.jx,h.jy,h.jz)]=c; else szClr[sk(h.jx,h.jy,h.jz)]=c; }
+function delPClr(h){ if(h.axis==='x') delete sxClr[sk(h.jx,h.jy,h.jz)]; else if(h.axis==='y') delete syClr[sk(h.jx,h.jy,h.jz)]; else delete szClr[sk(h.jx,h.jy,h.jz)]; }
+
+function getX(a,b,c){ return sx[sk(a,b,c)]||null; }
+function getY(a,b,c){ return sy[sk(a,b,c)]||null; }
+function getZ(a,b,c){ return sz[sk(a,b,c)]||null; }
+function setX(a,b,c,t){ if(t) sx[sk(a,b,c)]=t; else delete sx[sk(a,b,c)]; }
+function setY(a,b,c,t){ if(t) sy[sk(a,b,c)]=t; else delete sy[sk(a,b,c)]; }
+function setZ(a,b,c,t){ if(t) sz[sk(a,b,c)]=t; else delete sz[sk(a,b,c)]; }
+
+function getPanel(h){ return h.axis==='x'?getX(h.jx,h.jy,h.jz):h.axis==='y'?getY(h.jx,h.jy,h.jz):getZ(h.jx,h.jy,h.jz); }
+function setPanel(h,t){ if(h.axis==='x') setX(h.jx,h.jy,h.jz,t); else if(h.axis==='y') setY(h.jx,h.jy,h.jz,t); else setZ(h.jx,h.jy,h.jz,t); }
+
+// ── DURUM
+var activeFloor = 0;
+var selAxis = 'x';     // 'x' | 'z' | 'tavan' | 'taban'
+var selType = 'duz';
+var viewMode = false;
+var araMode = false;   // ara panel modu: snap pozisyonları STEP/2'ye kayar
+
+// ── RENKLER
+var PCOL = {
+  duz:0x4466cc,
+  parmaklik:0x3ddc84, parmaklik1:0x3ddc84,
+  yari:0x9966cc, yari1:0xaa55dd, yari2:0xbb44ee, yari3:0x9944bb,
+  kapi:0xffd166, kapi1:0xffc433, kapi2:0xffb800, kapi3:0xffd980,
+  tunel:0xff4444, tunel1:0xff6666,
+  yari_kapi:0xff8c00, yari_kapi1:0xff7700, yari_kapi2:0xff6600, yari_kapi3:0xff9a33,
+  suluk:0x00c8ff
+};
+var CCOL = [0, 0x555566, 0x33aa66, 0xddcc22, 0xff8822, 0xff4444, 0xff44ff];
+var AXIS_LABEL = {x:'DUV-X', z:'DUV-Z', tavan:'TAVAN', taban:'TABAN'};
+var TYPE_LABEL = {
+  duz:'DUZ',
+  parmaklik:'PARMAKLIK ↕', parmaklik1:'PARMAKLIK ↔',
+  yari:'YARI ↓dolu', yari1:'YARI →dolu', yari2:'YARI ↑dolu', yari3:'YARI ←dolu',
+  kapi:'KAPI ↓', kapi1:'KAPI ←', kapi2:'KAPI ↑', kapi3:'KAPI →',
+  tunel:'TUNEL (dış)', tunel1:'TUNEL (iç)',
+  yari_kapi:'Y.KAPI ↓', yari_kapi1:'Y.KAPI →', yari_kapi2:'Y.KAPI ↑', yari_kapi3:'Y.KAPI ←',
+  suluk:'SULUK/YEM',
+  kafes_boru:'K.BORU'
+};
+// tıklama döngüsü: hangi tip neye dönüşür (null = sil)
+var CYCLE = {
+  yari:'yari1', yari1:'yari2', yari2:'yari3', yari3:null,
+  parmaklik:'parmaklik1', parmaklik1:null,
+  kapi:'kapi1', kapi1:'kapi2', kapi2:'kapi3', kapi3:null,
+  tunel:'tunel1', tunel1:null,
+  yari_kapi:'yari_kapi1', yari_kapi1:'yari_kapi2', yari_kapi2:'yari_kapi3', yari_kapi3:null
+};
+
+// Belirtilen grid noktasında herhangi bir eksen paneli var mı?
+function anyPanel(jx, jy, jz){
+  return !!(getX(jx,jy,jz)||getZ(jx,jy,jz)||getY(jx,jy,jz)||getY(jx,Math.max(0,jy-1),jz));
+}
+
+// ── PANEL YARDIMCI FONKSİYONLARI
+// SCAD panel-lokal (px,py,pz,pw,pth,pd) → Three.js axis'e göre merkez+boyut
+function pOff(axis, px, py, pz, pw, pth, pd) {
+  var cx = px + pw/2 - PSZ/2;
+  var cy = py + pth/2 - pth/2;  // VPT ile de merkez 0'da kalır
+  var cz = pz + pd/2 - PSZ/2;
+  if(axis==='y') return {gx:pw, gy:pth, gz:pd, ox:cx, oy:cy, oz:cz};
+  if(axis==='x') return {gx:pth, gy:pw, gz:pd, ox:cy, oy:cx, oz:cz};
+                 return {gx:pw, gy:pd, gz:pth, ox:cx, oy:cz, oz:cy};
+}
+function addBox(G, axis, px, py, pz, pw, pth, pd, col, op) {
+  var b = pOff(axis, px, py, pz, pw, pth, pd);
+  var m = new THREE.Mesh(new THREE.BoxGeometry(b.gx, b.gy, b.gz),
+    new THREE.MeshPhongMaterial({color:col, shininess:40, side:THREE.DoubleSide, transparent:true, opacity:op}));
+  m.position.set(b.ox, b.oy, b.oz); G.add(m);
+}
+function addCyl(G, axis, pcx, pcz, r, op) {
+  var geo = new THREE.CylinderGeometry(r, r, VPT+2, 24);
+  var mat = new THREE.MeshBasicMaterial({color:0x0a0e14, transparent:true, opacity:op*0.9, side:THREE.DoubleSide});
+  var m = new THREE.Mesh(geo, mat);
+  var ox = pcx - PSZ/2, oz = pcz - PSZ/2;
+  if(axis==='y'){ m.position.set(ox, 0, oz); }
+  else if(axis==='x'){ m.rotation.z = Math.PI/2; m.position.set(0, ox, oz); }
+  else { m.rotation.x = Math.PI/2; m.position.set(ox, oz, 0); }
+  G.add(m);
+}
+// yari_kapi için yarım silindir (thetaStart eksen+variante göre seçilir)
+var YKAPI_THETA = {
+  yari_kapi:  {y:0,             x:0,             z:Math.PI},
+  yari_kapi1: {y:Math.PI/2,     x:Math.PI/2,     z:Math.PI/2},
+  yari_kapi2: {y:Math.PI,       x:Math.PI,       z:0},
+  yari_kapi3: {y:3*Math.PI/2,   x:3*Math.PI/2,   z:3*Math.PI/2}
+};
+function addHalfCyl(G, axis, pcx, pcz, r, op, thetaStart) {
+  var geo = new THREE.CylinderGeometry(r, r, VPT+2, 24, 1, true, thetaStart, Math.PI);
+  var mat = new THREE.MeshBasicMaterial({color:0x0a0e14, transparent:true, opacity:op*0.9, side:THREE.DoubleSide});
+  var m = new THREE.Mesh(geo, mat);
+  var ox = pcx - PSZ/2, oz = pcz - PSZ/2;
+  if(axis==='y'){ m.position.set(ox, 0, oz); }
+  else if(axis==='x'){ m.rotation.z = Math.PI/2; m.position.set(0, ox, oz); }
+  else { m.rotation.x = Math.PI/2; m.position.set(ox, oz, 0); }
+  G.add(m);
+}
+function addCollar(G, axis, pcx, pcz, r, len, col, op, side) {
+  side = (side === undefined) ? -1 : side;
+  var geo = new THREE.CylinderGeometry(r, r, len, 24, 1, true);
+  var mat = new THREE.MeshPhongMaterial({color:col, shininess:60, side:THREE.DoubleSide, transparent:true, opacity:op});
+  var m = new THREE.Mesh(geo, mat);
+  var ox = pcx - PSZ/2, oz = pcz - PSZ/2, cy = side * (VPT/2 + len/2);
+  if(axis==='y'){ m.position.set(ox, cy, oz); }
+  else if(axis==='x'){ m.rotation.z = Math.PI/2; m.position.set(cy, ox, oz); }
+  else { m.rotation.x = Math.PI/2; m.position.set(ox, oz, cy); }
+  G.add(m);
+}
+function buildPanelGroup(type, axis, col, op) {
+  var G = new THREE.Group();
+  var S = PSZ/110;
+  var mg=10*S, bw=2*S, rs=98*S, inner=PSZ-2*mg, mid=PSZ/2, hi=mid-mg;
+
+  if(type === 'duz') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+
+  } else if(type === 'parmaklik') {
+    addBox(G, axis, 0,  0, 0,      PSZ,    VPT, mg,    col, op);
+    addBox(G, axis, 0,  0, PSZ-mg, PSZ,    VPT, mg,    col, op);
+    addBox(G, axis, 0,  0, mg,     mg+bw,  VPT, inner, col, op);
+    addBox(G, axis, rs, 0, mg,     PSZ-rs, VPT, inner, col, op);
+    for(var i=0; i<7; i++) addBox(G, axis, (21+i*11)*S, 0, mg, bw, VPT, inner, col, op);
+
+  } else if(type === 'parmaklik1') {
+    addBox(G, axis, 0,  0, 0,      mg+bw,  VPT, PSZ, col, op);
+    addBox(G, axis, rs, 0, 0,      PSZ-rs, VPT, PSZ, col, op);
+    addBox(G, axis, 0,  0, 0,      PSZ,    VPT, mg,    col, op);
+    addBox(G, axis, 0,  0, PSZ-mg, PSZ,    VPT, mg,    col, op);
+    for(var i=0; i<7; i++) addBox(G, axis, mg, 0, (21+i*11)*S, inner, VPT, bw, col, op);
+
+  } else if(type === 'yari') {
+    addBox(G, axis, 0,  0, 0,      PSZ,    VPT, mid,  col, op);
+    addBox(G, axis, 0,  0, PSZ-mg, PSZ,    VPT, mg,   col, op);
+    addBox(G, axis, 0,  0, mid,    mg+bw,  VPT, hi,   col, op);
+    addBox(G, axis, rs, 0, mid,    PSZ-rs, VPT, hi,   col, op);
+    for(var i=0; i<7; i++) addBox(G, axis, (21+i*11)*S, 0, mid, bw, VPT, hi, col, op);
+
+  } else if(type === 'yari1') {
+    addBox(G, axis, 0,      0, 0, mid,    VPT, PSZ,   col, op);
+    addBox(G, axis, PSZ-mg, 0, 0, mg,     VPT, PSZ,   col, op);
+    addBox(G, axis, mid,    0, 0, mid-mg, VPT, mg+bw, col, op);
+    addBox(G, axis, mid,    0, PSZ-mg, mid-mg, VPT, mg, col, op);
+    for(var i=0; i<7; i++){
+      var bpx=(21+i*11)*S; if(bpx>mid && bpx<PSZ-mg) addBox(G, axis, bpx, 0, mg, bw, VPT, inner, col, op);
+    }
+
+  } else if(type === 'yari2') {
+    addBox(G, axis, 0,  0, mid,    PSZ,    VPT, mid,  col, op);
+    addBox(G, axis, 0,  0, 0,      PSZ,    VPT, mg,   col, op);
+    addBox(G, axis, 0,  0, mg,     mg+bw,  VPT, hi,   col, op);
+    addBox(G, axis, rs, 0, mg,     PSZ-rs, VPT, hi,   col, op);
+    for(var i=0; i<7; i++) addBox(G, axis, (21+i*11)*S, 0, mg, bw, VPT, hi, col, op);
+
+  } else if(type === 'yari3') {
+    addBox(G, axis, mid,    0, 0, mid,    VPT, PSZ,   col, op);
+    addBox(G, axis, 0,      0, 0, mg,     VPT, PSZ,   col, op);
+    addBox(G, axis, mg,     0, 0, mid-mg, VPT, mg+bw, col, op);
+    addBox(G, axis, mg,     0, PSZ-mg, mid-mg, VPT, mg, col, op);
+    for(var i=0; i<7; i++){
+      var bpx=(21+i*11)*S; if(bpx>mg && bpx<mid) addBox(G, axis, bpx, 0, mg, bw, VPT, inner, col, op);
+    }
+
+  } else if(type === 'kapi') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 55*S, 40*S, 30*S, op);
+  } else if(type === 'kapi1') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 40*S, 55*S, 30*S, op);
+  } else if(type === 'kapi2') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 55*S, 70*S, 30*S, op);
+  } else if(type === 'kapi3') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 70*S, 55*S, 30*S, op);
+
+  } else if(type === 'tunel') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 55*S, 55*S, 30*S, op);
+    addCollar(G, axis, 55*S, 55*S, 37*S, 10*S, col, op*0.75, -1);
+
+  } else if(type === 'tunel1') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 55*S, 55*S, 30*S, op);
+    addCollar(G, axis, 55*S, 55*S, 37*S, 10*S, col, op*0.75, +1);
+
+  } else if(type === 'yari_kapi') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addHalfCyl(G, axis, 55*S, 0, 30*S, op, YKAPI_THETA.yari_kapi[axis]||0);
+  } else if(type === 'yari_kapi1') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addHalfCyl(G, axis, PSZ, 55*S, 30*S, op, YKAPI_THETA.yari_kapi1[axis]||0);
+  } else if(type === 'yari_kapi2') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addHalfCyl(G, axis, 55*S, PSZ, 30*S, op, YKAPI_THETA.yari_kapi2[axis]||0);
+  } else if(type === 'yari_kapi3') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addHalfCyl(G, axis, 0, 55*S, 30*S, op, YKAPI_THETA.yari_kapi3[axis]||0);
+
+  } else if(type === 'suluk') {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+    addCyl(G, axis, 55*S, 55*S, 32.5*S, op);
+
+  } else {
+    addBox(G, axis, 0, 0, 0, PSZ, VPT, PSZ, col, op);
+  }
+  return G;
+}
+
+// ── CONNECTOR GEOMETRİSİ (32×32×3mm plaka, 3 eksen yönü)
+var _cGX=null, _cGY=null, _cGZ=null;
+function cGeoX(){ if(!_cGX){ var s=32*(PSZ/110); _cGX=new THREE.BoxGeometry(PT,s,s); } return _cGX; }
+function cGeoY(){ if(!_cGY){ var s=32*(PSZ/110); _cGY=new THREE.BoxGeometry(s,PT,s); } return _cGY; }
+function cGeoZ(){ if(!_cGZ){ var s=32*(PSZ/110); _cGZ=new THREE.BoxGeometry(s,s,PT); } return _cGZ; }
+
+// ── BORU GEOMETRİSİ
+function buildKafesBoru(dir, col, op) {
+  var S=PSZ/110, r=30*S, len=100*S, bT=1.8*S;
+  var G=new THREE.Group();
+  var mat=new THREE.MeshPhongMaterial({color:col,shininess:60,transparent:true,opacity:op});
+  // Boyuna çubuklar — 8 adet
+  var barGeo=new THREE.CylinderGeometry(bT,bT,len,6);
+  for(var k=0;k<8;k++){
+    var ang=k*Math.PI/4, bx=r*Math.cos(ang), bz=r*Math.sin(ang);
+    var bar=new THREE.Mesh(barGeo,mat.clone());
+    if(dir==='x'){ bar.rotation.z=Math.PI/2; bar.position.set(0,bx,bz); }
+    else if(dir==='z'){ bar.rotation.x=Math.PI/2; bar.position.set(bx,bz,0); }
+    else { bar.position.set(bx,0,bz); }
+    G.add(bar);
+  }
+  // Halka çemberleri — 6 adet
+  var ringGeo=new THREE.TorusGeometry(r,bT*1.2,6,24);
+  for(var i=0;i<6;i++){
+    var t=(i/5-0.5)*len;
+    var ring=new THREE.Mesh(ringGeo,mat.clone());
+    if(dir==='x'){ ring.rotation.y=Math.PI/2; ring.position.set(t,0,0); }
+    else if(dir==='z'){ ring.rotation.x=Math.PI/2; ring.position.set(0,0,t); }
+    else { ring.position.set(0,t,0); }
+    G.add(ring);
+  }
+  return G;
+}
+function buildBoruMesh(dir, col, op) {
+  var S = PSZ/110, r=30*S, ri=24*S, len=100*S;
+  var G = new THREE.Group();
+  // dış tüp — solid kapaklı, kesinlikle görünür
+  var matOut = new THREE.MeshPhongMaterial({color:col, shininess:80, transparent:true, opacity:op});
+  G.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 24), matOut));
+  // iç koyu silindir biraz uzun → uçlardan delik izlenimi
+  var matIn = new THREE.MeshPhongMaterial({color:0x0d1117, shininess:0, transparent:true, opacity:op});
+  G.add(new THREE.Mesh(new THREE.CylinderGeometry(ri, ri, len+8, 24), matIn));
+  if(dir==='x') G.rotation.z = Math.PI/2;
+  else if(dir==='z') G.rotation.x = Math.PI/2;
+  return G;
+}
+
+// tünel birleştirme halkası görsel
+function buildTunelBag(dir, col, op){
+  var S=PSZ/110, r=37*S, len=18*S;
+  var G=new THREE.Group();
+  var mat=new THREE.MeshPhongMaterial({color:col,shininess:60,side:THREE.DoubleSide,transparent:true,opacity:op});
+  G.add(new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,24,1,true),mat));
+  if(dir==='x') G.rotation.z=Math.PI/2;
+  else if(dir==='z') G.rotation.x=Math.PI/2;
+  return G;
+}
+
+// hover için basit box (tip bağımsız)
+function panelGeom(axis){
+  if(axis==='x') return new THREE.BoxGeometry(VPT+2, PSZ, PSZ);
+  if(axis==='y') return new THREE.BoxGeometry(PSZ, VPT+2, PSZ);
+  return new THREE.BoxGeometry(PSZ, PSZ, VPT+2);
+}
+
+// ── PANEL POZİSYONU
+function panelPos(h){
+  var O=off();
+  if(h.axis==='x') return [O+h.jx*STEP+STEP/2, O+h.jy*STEP,        O+h.jz*STEP];
+  if(h.axis==='y') return [O+h.jx*STEP,         O+h.jy*STEP+STEP/2, O+h.jz*STEP];
+  return                   [O+h.jx*STEP,         O+h.jy*STEP,        O+h.jz*STEP+STEP/2];
+}
+
+// ── AKTIF KAT RAYCAST
+function rayHitFloor(ray){
+  var O = off();
+  // boru modu: panel junction'larına hizalı snap
+  if(selType === 'boru' || selType === 'kafes_boru'){
+    var oy=ray.origin.y, dy=ray.direction.y;
+    if(Math.abs(dy)<1e-6) return null;
+    var yPlane2=off()+activeFloor*STEP;
+    var t=(yPlane2-oy)/dy; if(t<5||t>40000) return null;
+    var hx=ray.origin.x+t*ray.direction.x, hz=ray.origin.z+t*ray.direction.z;
+    if(boruDir==='x'){
+      // merkez X=O+(jx+1)*STEP, Y=O+jy*STEP, Z=O+jz*STEP
+      var ix=Math.max(1,Math.min(GRID_N-2,Math.round((hx-O)/STEP)));
+      var jz=Math.max(0,Math.min(GRID_N-1,Math.round((hz-O)/STEP)));
+      return {type:'boru',dir:'x',jx:ix-1,jy:activeFloor,jz:jz};
+    } else if(boruDir==='z'){
+      // merkez X=O+jx*STEP, Y=O+jy*STEP, Z=O+(jz+1)*STEP
+      var jx=Math.max(0,Math.min(GRID_N-1,Math.round((hx-O)/STEP)));
+      var iz=Math.max(1,Math.min(GRID_N-2,Math.round((hz-O)/STEP)));
+      return {type:'boru',dir:'z',jx:jx,jy:activeFloor,jz:iz-1};
+    } else {
+      // boruY: merkez Y=O+(jy+1)*STEP → jy=activeFloor-1 → center on floor plane
+      var jx=Math.max(0,Math.min(GRID_N-1,Math.round((hx-O)/STEP)));
+      var jz=Math.max(0,Math.min(GRID_N-1,Math.round((hz-O)/STEP)));
+      return {type:'boru',dir:'y',jx:jx,jy:Math.max(0,activeFloor-1),jz:jz};
+    }
+  }
+  var yPlane = off() + activeFloor * STEP;
+  var oy = ray.origin.y, dy = ray.direction.y;
+  if(Math.abs(dy) < 1e-6) return null;
+  var t = (yPlane - oy) / dy;
+  if(t < 5 || t > 40000) return null;
+
+  var hx = ray.origin.x + t*ray.direction.x;
+  var hz = ray.origin.z + t*ray.direction.z;
+  var jy = activeFloor, jx, jz;
+
+  if(selAxis === 'x'){
+    if(araMode){
+      // ARA: X junction'a snap — validasyon yok, serbestçe koy
+      var jx_j = Math.max(1, Math.min(GRID_N-2, Math.round((hx - O) / STEP)));
+      jx = jx_j - 0.5;
+      jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
+    } else {
+      jx = Math.max(0, Math.min(GRID_N-2, Math.round((hx - O - STEP/2) / STEP)));
+      jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
+    }
+    return {axis:'x', jx:jx, jy:jy, jz:jz};
+  } else if(selAxis === 'z'){
+    if(araMode){
+      // ARA: Z junction'a snap — validasyon yok, serbestçe koy
+      var jz_j = Math.max(1, Math.min(GRID_N-2, Math.round((hz - O) / STEP)));
+      jz = jz_j - 0.5;
+      jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
+    } else {
+      jz = Math.max(0, Math.min(GRID_N-2, Math.round((hz - O - STEP/2) / STEP)));
+      jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
+    }
+    return {axis:'z', jx:jx, jy:jy, jz:jz};
+  } else if(selAxis === 'tavan'){
+    if(jy >= GRID_N-1) return null;
+    jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
+    jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
+    if(araMode){
+      // ARA: Y ortasına snap — validasyon yok, serbestçe koy
+      return {axis:'y', jx:jx, jy:Math.max(0.5, jy-0.5), jz:jz};
+    }
+    return {axis:'y', jx:jx, jy:jy, jz:jz};
+  } else {
+    var jy_taban = Math.max(0, jy-1);
+    jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
+    jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
+    if(araMode){
+      // ARA: TAVAN ile aynı pozisyon → jy_stored = jy - 0.5
+      return {axis:'y', jx:jx, jy:Math.max(0.5, jy-0.5), jz:jz};
+    }
+    return {axis:'y', jx:jx, jy:jy_taban, jz:jz};
+  }
+}
+
+// ── CONNECTOR SAYISI (BOM için)
+function cCount(jx, jy, jz){
+  var n=0;
+  if(jx>0        && getX(jx-1, jy, jz)) n++;
+  if(jx<GRID_N-1 && getX(jx,   jy, jz)) n++;
+  if(jy>0        && getY(jx, jy-1, jz)) n++;
+  if(jy<GRID_N-1 && getY(jx, jy,   jz)) n++;
+  if(jz>0        && getZ(jx, jy, jz-1)) n++;
+  if(jz<GRID_N-1 && getZ(jx, jy, jz  )) n++;
+  return n;
+}
+
+// ── THREE.JS NESNELERİ
+var scene, camera, renderer;
+var panelGroup, connGroup;
+var hoverMesh, floorGroup;
+var hoverGeoCache = {};
+
+function getHoverGeo(axis){
+  if(!hoverGeoCache[axis]) hoverGeoCache[axis] = panelGeom(axis);
+  return hoverGeoCache[axis];
+}
+
+// ── SAHNE KURULUM
+function initThree(){
+  var wrap = document.getElementById('viewport');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0d1117);
+  scene.fog = new THREE.Fog(0x0d1117, 8000, 18000);
+
+  camera = new THREE.PerspectiveCamera(45, wrap.clientWidth/wrap.clientHeight, 1, 30000);
+  renderer = new THREE.WebGLRenderer({antialias:true, canvas:document.getElementById('c')});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  var d1 = new THREE.DirectionalLight(0xffffff, 0.85);
+  d1.position.set(600, 1200, 800); scene.add(d1);
+  var d2 = new THREE.DirectionalLight(0x8090ff, 0.25);
+  d2.position.set(-400, -200, -600); scene.add(d2);
+
+  var boxSz = (GRID_N-1)*STEP;
+  scene.add(new THREE.Mesh(
+    new THREE.BoxGeometry(boxSz, boxSz, boxSz),
+    new THREE.MeshBasicMaterial({color:0x21262d, wireframe:true, transparent:true, opacity:.25})
+  ));
+
+  var O = off(), span = boxSz;
+  var lmat = new THREE.LineBasicMaterial({color:0x21262d, transparent:true, opacity:.35});
+  for(var i=0; i<GRID_N; i++){
+    var g1 = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(O+i*STEP, O, O), new THREE.Vector3(O+i*STEP, O, O+span)]);
+    var g2 = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(O, O, O+i*STEP), new THREE.Vector3(O+span, O, O+i*STEP)]);
+    scene.add(new THREE.Line(g1, lmat));
+    scene.add(new THREE.Line(g2, lmat));
+  }
+
+  // Hacimsel kat kutusu — fill + kenar çizgileri
+  var slabGeo = new THREE.BoxGeometry(boxSz, STEP, boxSz);
+  var slabFill = new THREE.Mesh(slabGeo,
+    new THREE.MeshBasicMaterial({color:0x00e5ff, transparent:true, opacity:0.045, depthWrite:false, side:THREE.FrontSide}));
+  var slabEdge = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(boxSz, STEP, boxSz)),
+    new THREE.LineBasicMaterial({color:0x00e5ff, transparent:true, opacity:0.40}));
+  floorGroup = new THREE.Group();
+  floorGroup.add(slabFill);
+  floorGroup.add(slabEdge);
+  floorGroup.position.y = O + STEP/2;
+  scene.add(floorGroup);
+
+  hoverMesh = new THREE.Mesh(
+    getHoverGeo('x'),
+    new THREE.MeshBasicMaterial({color:0x00ffcc, transparent:true, opacity:.5, depthWrite:false, side:THREE.DoubleSide})
+  );
+  hoverMesh.visible = false;
+  scene.add(hoverMesh);
+}
+
+// ── REBUILD
+function rebuild(){
+  if(panelGroup){
+    scene.remove(panelGroup);
+    panelGroup.traverse(function(o){ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+  }
+  if(connGroup){
+    scene.remove(connGroup);
+    connGroup.traverse(function(o){ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+  }
+  panelGroup = new THREE.Group();
+  connGroup  = new THREE.Group();
+
+  var O = off();
+
+  [['x',sx],['y',sy],['z',sz]].forEach(function(av){
+    var axis=av[0], dict=av[1];
+    Object.entries(dict).forEach(function(e){
+      var parts = e[0].split('_');
+      var h = {axis:axis, jx:+parts[0], jy:+parts[1], jz:+parts[2]};
+      var clrOver = getPClr(h);
+      var col = clrOver !== undefined ? clrOver : (PCOL[e[1]] || PCOL.duz);
+      var onActive = (axis === 'y')
+        ? (h.jy === activeFloor || h.jy === activeFloor - 1 || h.jy === activeFloor - 0.5)
+        : (h.jy === activeFloor);
+      var op = viewMode ? 0.88 : (onActive ? 0.88 : 0.13);
+      var G = buildPanelGroup(e[1], axis, col, op);
+      if(onActive && !viewMode){
+        G.traverse(function(obj){
+          if(obj.isMesh && obj.material && obj.material.type === 'MeshPhongMaterial'){
+            obj.material = obj.material.clone();
+            obj.material.emissive = new THREE.Color(col).multiplyScalar(0.18);
+          }
+        });
+      }
+      var pos = panelPos(h);
+      G.position.set(pos[0], pos[1], pos[2]);
+      panelGroup.add(G);
+    });
+  });
+
+  // ── BORULAR (tek dict, fiziksel konum bazlı)
+  Object.entries(boru).forEach(function(e){
+    var p=e[0].split('_'), dir=e[1];
+    var px=+p[0], py=+p[1], pz=+p[2];
+    var onAct=(py===activeFloor);
+    var op=viewMode?0.88:(onAct?0.88:0.13);
+    var bc=boruClr[e[0]]||0xff9900;
+    var G = boruStyle[e[0]]==='kafes_boru' ? buildKafesBoru(dir,bc,op) : buildBoruMesh(dir,bc,op);
+    G.position.set(O+px*STEP, O+py*STEP, O+pz*STEP);
+    panelGroup.add(G);
+  });
+
+  // ── AUTO BORU-BORU BAĞLANTI HALKASI
+  var _bbSet={};
+  Object.keys(boru).forEach(function(k){
+    var p=k.split('_'), px=+p[0],py=+p[1],pz=+p[2];
+    var dir=boru[k], nk, wx, wy, wz;
+    if(dir==='x'){ nk=sk(px+1,py,pz); wx=O+(px+0.5)*STEP; wy=O+py*STEP; wz=O+pz*STEP; }
+    else if(dir==='z'){ nk=sk(px,py,pz+1); wx=O+px*STEP; wy=O+py*STEP; wz=O+(pz+0.5)*STEP; }
+    else { nk=sk(px,py+1,pz); wx=O+px*STEP; wy=O+(py+0.5)*STEP; wz=O+pz*STEP; }
+    if(boru[nk]===dir){
+      var bkey=Math.round(wx)+'_'+Math.round(wy)+'_'+Math.round(wz)+'_'+dir;
+      if(_bbSet[bkey]) return; _bbSet[bkey]=1;
+      var onAct=(py===activeFloor);
+      var op=viewMode?0.88:(onAct?0.88:0.13);
+      var G=buildTunelBag(dir,0x44ddaa,op);
+      G.position.set(wx,wy,wz); panelGroup.add(G);
+    }
+  });
+
+  // ── CONNECTOR'LAR — her kenar bağlantısı 2 aynı parça, aralarında 3mm
+  var CONN_COL = 0xffd166;
+  var conn_s = 32*(PSZ/110);               // plaka geniş kenar boyu ~31.6mm
+  var conn_gap = 3;                         // iki parça arası boşluk mm
+  // Her offset yönü için doğru yarı-mesafe:
+  //   ince eksen (PT=3mm) boyunca ayrılıyorsa → (PT + gap) / 2 = 3mm
+  //   geniş eksen (s~32mm) boyunca ayrılıyorsa → (s + gap) / 2 ≈ 17.3mm
+  var conn_hT = (PT + conn_gap) / 2;        // ince eksen split = 3mm
+  var conn_hW = (conn_s + conn_gap) / 2;    // geniş eksen split ≈ 17.3mm
+
+  // ox/oy/oz: ayrılma yönü — h: o yöndeki yarı-mesafe
+  function addConn(px, py, pz, geo, onAct, ox, oy, oz, h){
+    var cop = viewMode ? 0.92 : (onAct ? 0.92 : 0.13);
+    [+1, -1].forEach(function(sign){
+      var mat = new THREE.MeshPhongMaterial({color:CONN_COL, transparent:true, opacity:cop, depthWrite:false});
+      var m = new THREE.Mesh(geo, mat);
+      m.position.set(px + sign*ox*h, py + sign*oy*h, pz + sign*oz*h);
+      connGroup.add(m);
+    });
+  }
+
+  // Connector pozisyonu — yatay STEP/2, dikey STEP_V/2
+  // Dedup: aynı noktaya birden fazla istek gelirse onAct OR'lanır (aktif kat öncelikli)
+  var SH_H = STEP/2;  // yatay offset = 60mm
+  var SH_V = STEP/2;  // dikey offset = 60mm
+  var connMap = {};
+  function addConnD(px, py, pz, geo, onAct, ox, oy, oz, h){
+    var key = Math.round(px)+'_'+Math.round(py)+'_'+Math.round(pz)+'_'+geo.uuid;
+    if(connMap[key]){ if(onAct) connMap[key].onAct=true; return; }
+    connMap[key] = {px:px,py:py,pz:pz,geo:geo,onAct:onAct,ox:ox,oy:oy,oz:oz,h:h};
+  }
+
+  // DUV-X (face YZ): Z-kenar→cGeoY split-Y(ince), Y-kenar→cGeoZ split-Z(ince)
+  Object.keys(sx).forEach(function(k){
+    var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
+    if(jx!==Math.floor(jx)) return; // ara panel → connector atla
+    var pos=panelPos({axis:'x',jx:jx,jy:jy,jz:jz});
+    var onAct=(jy===activeFloor);
+    if(getX(jx,jy,jz+1)||getZ(jx,jy,jz)||getZ(jx+1,jy,jz))
+      addConnD(pos[0], pos[1], pos[2]+SH_H, cGeoY(), onAct, 0,1,0, conn_hT);
+    if(getX(jx,jy,jz-1)||getZ(jx,jy,jz-1)||getZ(jx+1,jy,jz-1))
+      addConnD(pos[0], pos[1], pos[2]-SH_H, cGeoY(), onAct, 0,1,0, conn_hT);
+    if(getY(jx,jy,jz)||getY(jx,jy,jz+1)||getX(jx,jy+1,jz))
+      addConnD(pos[0], pos[1]+SH_V, pos[2], cGeoZ(), onAct, 0,0,1, conn_hT);
+    if(getY(jx,jy-1,jz)||getY(jx,jy-1,jz+1)||getX(jx,jy-1,jz))
+      addConnD(pos[0], pos[1]-SH_V, pos[2], cGeoZ(), onAct, 0,0,1, conn_hT);
+  });
+
+  // DUV-Z (face XY): X-kenar→cGeoY split-Y(ince), Y-kenar→cGeoX split-X(ince)
+  Object.keys(sz).forEach(function(k){
+    var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
+    if(jx!==Math.floor(jx)) return; // ara panel → connector atla
+    var pos=panelPos({axis:'z',jx:jx,jy:jy,jz:jz});
+    var onAct=(jy===activeFloor);
+    if(getZ(jx+1,jy,jz)||getX(jx,jy,jz)||getX(jx,jy,jz+1))
+      addConnD(pos[0]+SH_H, pos[1], pos[2], cGeoY(), onAct, 0,1,0, conn_hT);
+    if(getZ(jx-1,jy,jz)||getX(jx-1,jy,jz)||getX(jx-1,jy,jz+1))
+      addConnD(pos[0]-SH_H, pos[1], pos[2], cGeoY(), onAct, 0,1,0, conn_hT);
+    if(getY(jx,jy,jz)||getY(jx+1,jy,jz)||getZ(jx,jy+1,jz))
+      addConnD(pos[0], pos[1]+SH_V, pos[2], cGeoX(), onAct, 1,0,0, conn_hT);
+    if(getY(jx,jy-1,jz)||getY(jx+1,jy-1,jz)||getZ(jx,jy-1,jz))
+      addConnD(pos[0], pos[1]-SH_V, pos[2], cGeoX(), onAct, 1,0,0, conn_hT);
+  });
+
+  // TAVAN/TABAN (face XZ): X-kenar→cGeoZ split-Z(ince), Z-kenar→cGeoX split-X(ince)
+  Object.keys(sy).forEach(function(k){
+    var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
+    if(jx!==Math.floor(jx)||jy!==Math.floor(jy)||jz!==Math.floor(jz)) return; // ara panel → connector atla
+    var pos=panelPos({axis:'y',jx:jx,jy:jy,jz:jz});
+    var onAct=(jy===activeFloor||jy===activeFloor-1);
+    if(getY(jx+1,jy,jz)||getX(jx,jy,jz)||getX(jx,jy-1,jz))
+      addConnD(pos[0]+SH_H, pos[1], pos[2], cGeoZ(), onAct, 0,0,1, conn_hT);
+    if(getY(jx-1,jy,jz)||getX(jx-1,jy,jz)||getX(jx-1,jy-1,jz))
+      addConnD(pos[0]-SH_H, pos[1], pos[2], cGeoZ(), onAct, 0,0,1, conn_hT);
+    if(getY(jx,jy,jz+1)||getZ(jx,jy,jz)||getZ(jx,jy-1,jz))
+      addConnD(pos[0], pos[1], pos[2]+SH_H, cGeoX(), onAct, 1,0,0, conn_hT);
+    if(getY(jx,jy,jz-1)||getZ(jx,jy,jz-1)||getZ(jx,jy-1,jz-1))
+      addConnD(pos[0], pos[1], pos[2]-SH_H, cGeoX(), onAct, 1,0,0, conn_hT);
+  });
+
+  // connMap flush — onAct OR'landıktan sonra çiz
+  Object.keys(connMap).forEach(function(k){
+    var c=connMap[k]; addConn(c.px,c.py,c.pz,c.geo,c.onAct,c.ox,c.oy,c.oz,c.h);
+  });
+
+  scene.add(panelGroup);
+  scene.add(connGroup);
+  updateBOM();
+  updateBoruWarn();
+  autoSave();
+}
+
+// Eşleşmeyen boru varsa uyarı göster, tıklayınca oraya odaklan
+var _warnPos = null;
+function updateBoruWarn(){
+  var warn = document.getElementById('boru-warn');
+  _warnPos = null;
+  Object.keys(boru).forEach(function(k){
+    if(_warnPos) return;
+    var p=k.split('_'), px=+p[0],py=+p[1],pz=+p[2];
+    var dir=boru[k];
+    var ok = false;
+    if(dir==='x') ok=boru[sk(px-1,py,pz)]==='x'||boru[sk(px+1,py,pz)]==='x';
+    else if(dir==='z') ok=boru[sk(px,py,pz-1)]==='z'||boru[sk(px,py,pz+1)]==='z';
+    else ok=boru[sk(px,py-1,pz)]==='y'||boru[sk(px,py+1,pz)]==='y';
+    if(!ok) _warnPos = [off()+px*STEP, off()+py*STEP, off()+pz*STEP];
+  });
+  warn.style.display = _warnPos ? 'block' : 'none';
+}
+
+// ── HOVER
+function updateHover(hit){
+  if(!hit){ hoverMesh.visible=false; setStatus('HAZIR','#484f58','#21262d'); return; }
+  hoverMesh.visible = true;
+  if(hit.type==='boru'){
+    var axKey='boru_'+hit.dir;
+    if(hoverMesh._lastAxis!==axKey){
+      var Sc=PSZ/110, r=32*Sc, len=STEP*0.85;
+      hoverMesh.geometry=new THREE.CylinderGeometry(r,r,len,24);
+      hoverMesh.rotation.set(0,0,0);
+      if(hit.dir==='x') hoverMesh.rotation.z=Math.PI/2;
+      else if(hit.dir==='z') hoverMesh.rotation.x=Math.PI/2;
+      hoverMesh._lastAxis=axKey;
+    }
+    var pos=boruPos(hit); hoverMesh.position.set(pos[0],pos[1],pos[2]);
+    var ex=getBoru(hit);
+    hoverMesh.material.color.setHex(ex?0xff2222:0x00ffcc);
+    hoverMesh.material.opacity=ex?0.55:0.45;
+    var bLabel=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
+    setStatus(ex?'SIL BORU':'KOY '+bLabel,ex?'#ff4444':'#3ddc84',ex?'rgba(255,68,68,.3)':'rgba(61,220,132,.3)');
+    return;
+  }
+  var existing = getPanel(hit);
+  if(hoverMesh._lastAxis !== hit.axis){
+    hoverMesh.geometry = getHoverGeo(hit.axis);
+    hoverMesh.rotation.set(0,0,0);
+    hoverMesh._lastAxis = hit.axis;
+  }
+  var pos = panelPos(hit);
+  hoverMesh.position.set(pos[0], pos[1], pos[2]);
+  if(existing){
+    hoverMesh.material.color.setHex(0xff2222);
+    hoverMesh.material.opacity = 0.65;
+    setStatus('SIL', '#ff4444', 'rgba(255,68,68,.3)');
+  } else {
+    hoverMesh.material.color.setHex(0x00ffcc);
+    hoverMesh.material.opacity = 0.6;
+    setStatus((araMode?'ARA ':'')+' KOY ['+AXIS_LABEL[selAxis]+']', '#3ddc84', 'rgba(61,220,132,.3)');
+  }
+}
+
+function setStatus(txt,col,brd){
+  var el = document.getElementById('status');
+  el.textContent=txt; el.style.color=col; el.style.borderColor=brd;
+}
+
+// ── BOM
+function updateBOM(){
+  var p = {duz:0, parmaklik:0, yari:0, kapi:0, tunel:0, yari_kapi:0, suluk:0};
+  var araCount = 0;
+  var c = [0,0,0,0,0,0,0];
+  var borCount = 0, kborCount = 0;
+  Object.keys(boru).forEach(function(k){
+    if(boruStyle[k]==='kafes_boru') kborCount++; else borCount++;
+  });
+  [['x',sx],['z',sz],['y',sy]].forEach(function(av){
+    Object.keys(av[1]).forEach(function(k){
+      var parts=k.split('_'), jx=+parts[0],jy=+parts[1],jz=+parts[2];
+      var isMidPanel = (jx!==Math.floor(jx))||(jy!==Math.floor(jy))||(jz!==Math.floor(jz));
+      if(isMidPanel){ araCount++; return; }
+      var t = av[1][k];
+      if(p[t]!==undefined) p[t]++;
+      else { var b=t.replace(/\d+$/,''); if(p[b]!==undefined) p[b]++; }
+    });
+  });
+  for(var jx=0;jx<GRID_N;jx++) for(var jy=0;jy<GRID_N;jy++) for(var jz=0;jz<GRID_N;jz++){
+    var n=cCount(jx,jy,jz); if(n) c[Math.min(n,6)]++;
+  }
+  document.getElementById('b-duz').textContent  = p.duz;
+  document.getElementById('b-par').textContent  = p.parmaklik;
+  document.getElementById('b-yar').textContent  = p.yari;
+  document.getElementById('b-kap').textContent  = p.kapi;
+  document.getElementById('b-tun').textContent  = p.tunel;
+  document.getElementById('b-ykap').textContent = p.yari_kapi;
+  document.getElementById('b-sul').textContent  = p.suluk;
+  document.getElementById('b-ara').textContent  = araCount;
+  document.getElementById('b-bor').textContent  = borCount;
+  document.getElementById('b-kbor').textContent = kborCount;
+  document.getElementById('b-c1').textContent   = c[1];
+  document.getElementById('b-c2').textContent   = c[2];
+  document.getElementById('b-c3').textContent   = c[3];
+  document.getElementById('b-c4').textContent   = c[4];
+  document.getElementById('b-c5').textContent   = (c[5]||0)+(c[6]||0);
+  document.getElementById('b-tot').textContent  = p.duz+p.parmaklik+p.yari+p.kapi+p.tunel+p.yari_kapi+p.suluk+araCount;
+  document.getElementById('b-ctot').textContent = c[1]+c[2]+c[3]+c[4]+(c[5]||0)+(c[6]||0);
+}
+
+// ── KAMERA
+var theta=0.55, phi=1.05, radius=200;
+// camTgt: eski radius=4800 overview pozisyonunu koru (camera.pos = camTgt + sph(200))
+var camTgt = new THREE.Vector3(2085, 2286, 3401);
+
+function camUpdate(){
+  camera.position.set(
+    camTgt.x + radius*Math.sin(phi)*Math.sin(theta),
+    camTgt.y + radius*Math.cos(phi),
+    camTgt.z + radius*Math.sin(phi)*Math.cos(theta)
+  );
+  camera.lookAt(camTgt);
+  renderer.render(scene, camera);
+}
+
+function doPan(dx, dy){
+  var speed = radius * 0.0008;
+  var rx = Math.cos(theta), rz = -Math.sin(theta);
+  var ux = -Math.cos(phi)*Math.sin(theta), uy = Math.sin(phi), uz = -Math.cos(phi)*Math.cos(theta);
+  camTgt.x += (-dx*rx + dy*ux)*speed;
+  camTgt.y += (dy*uy)*speed;
+  camTgt.z += (-dx*rz + dy*uz)*speed;
+  camUpdate();
+}
+
+var VIEWS = {
+  iso:  {theta:0.55, phi:1.05,        radius:4800},
+  top:  {theta:0,    phi:0.02,        radius:4800},
+  front:{theta:0,    phi:Math.PI/2,   radius:4800},
+  right:{theta:Math.PI/2, phi:Math.PI/2, radius:4800}
+};
+function setView(name){
+  var v = VIEWS[name]; if(!v) return;
+  theta=v.theta; phi=v.phi; radius=v.radius;
+  camTgt.set(0, 0, 0); camUpdate();
+}
+
+// ── KAT + SMOOTH ANİMASYON
+var _floorAnimId = null;
+function animFloor(){
+  var target = off() + activeFloor*STEP;
+  var diff = target - floorGroup.position.y;
+  if(Math.abs(diff) < 0.8){ floorGroup.position.y = target; _floorAnimId=null; renderer.render(scene,camera); return; }
+  floorGroup.position.y += diff * 0.20;
+  renderer.render(scene, camera);
+  _floorAnimId = requestAnimationFrame(animFloor);
+}
+function setFloor(f){
+  activeFloor = Math.max(1, Math.min(GRID_N-1, f));
+  var d = activeFloor - 1;  // görsel: 0,1,2,... (min=1 iç, min=0 görsel)
+  document.getElementById('fl-num').textContent = d;
+  document.getElementById('io-floor').textContent = d;
+  rebuild();
+  if(_floorAnimId) cancelAnimationFrame(_floorAnimId);
+  _floorAnimId = requestAnimationFrame(animFloor);
+  camUpdate();
+}
+
+function focusFloor(){
+  camTgt.y = off() + activeFloor * STEP;
+  camUpdate();
+}
+
+// ── YÖN
+function setAxis(ax){
+  selAxis = ax;
+  document.querySelectorAll('.axbtn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.axis===ax);
+  });
+  document.getElementById('io-axis').textContent = AXIS_LABEL[ax];
+}
+
+// ── ARA PANEL MODU
+function toggleAra(){
+  araMode = !araMode;
+  var btn = document.getElementById('btn-ara');
+  var ov  = document.getElementById('io-ara');
+  if(araMode){
+    btn.style.color = '#ff6b35'; btn.style.borderColor = '#ff6b35';
+    btn.textContent = 'ARA MOD: AÇIK  ( M )';
+    ov.style.color = '#ff6b35'; ov.textContent = 'ARA:ON';
+  } else {
+    btn.style.color = '#484f58'; btn.style.borderColor = '';
+    btn.textContent = 'ARA MOD: KAPALI  ( M )';
+    ov.style.color = '#484f58'; ov.textContent = 'ARA:OFF';
+  }
+}
+
+// ── FLY MODE (F modunda FPS tarzı uçuş)
+var flyKeys = {};
+var _flyId  = null;
+var FLY_SPD = 25;
+var _fwd = new THREE.Vector3(), _rgt = new THREE.Vector3(), _up = new THREE.Vector3(0,1,0);
+var _savedRadius = null;
+var FLY_RADIUS = 200;  // fly modda kamera ile hedef arası mesafe
+
+function flyStep(){
+  if(_flyId === null){ return; }
+  var moved = false;
+  // İleri yönü theta/phi'den hesapla — radius'tan bağımsız
+  _fwd.set(Math.sin(phi)*Math.sin(theta), Math.cos(phi), Math.sin(phi)*Math.cos(theta));
+  _rgt.crossVectors(_fwd, _up).normalize();
+  var s = FLY_SPD;
+  if(flyKeys['w']||flyKeys['W']){ camTgt.addScaledVector(_fwd, -s); moved=true; }
+  if(flyKeys['s']||flyKeys['S']){ camTgt.addScaledVector(_fwd,  s); moved=true; }
+  if(flyKeys['a']||flyKeys['A']){ camTgt.addScaledVector(_rgt,  s); moved=true; }
+  if(flyKeys['d']||flyKeys['D']){ camTgt.addScaledVector(_rgt, -s); moved=true; }
+  if(flyKeys[' '])               { camTgt.y -= s; moved=true; }
+  if(flyKeys['Shift'])           { camTgt.y += s; moved=true; }
+  if(moved) camUpdate();
+  _flyId = requestAnimationFrame(flyStep);
+}
+
+// ── İZLEME MODU
+function toggleView(){
+  viewMode = !viewMode;
+  document.getElementById('sidebar').style.display      = viewMode ? 'none'  : 'flex';
+  document.getElementById('hint').style.display         = viewMode ? 'none'  : 'block';
+  document.getElementById('info-overlay').style.display = viewMode ? 'none'  : 'block';
+  document.getElementById('status').style.display       = viewMode ? 'none'  : 'block';
+  document.getElementById('exit-view').style.display    = viewMode ? 'block' : 'none';
+  floorGroup.visible = !viewMode;
+  if(viewMode){
+    hoverMesh.visible = false;
+  } else {
+    flyKeys = {};
+  }
+  rebuild();
+  camUpdate();
+}
+
+// ── INPUT
+var rDrag=false, rpx=0, rpy=0;
+var pDrag=false, ppx=0, ppy=0;
+var clickDown=false, clickSx=0, clickSy=0;
+var rc = new THREE.Raycaster(), msVec = new THREE.Vector2();
+var currentHit = null;
+
+function setMouse(e){
+  var rect = renderer.domElement.getBoundingClientRect();
+  msVec.x =  ((e.clientX-rect.left)/rect.width)*2-1;
+  msVec.y = -((e.clientY-rect.top)/rect.height)*2+1;
+}
+
+function initEvents(){
+  renderer.domElement.addEventListener('mousedown', function(e){
+    if(e.button===2){ rDrag=true; rpx=e.clientX; rpy=e.clientY; e.preventDefault(); }
+    if(e.button===1){ pDrag=true; ppx=e.clientX; ppy=e.clientY; e.preventDefault(); }
+    if(e.button===0){ clickDown=true; clickSx=e.clientX; clickSy=e.clientY; }
+  }, false);
+
+  renderer.domElement.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+  window.addEventListener('mousemove', function(e){
+    if(rDrag){
+      theta -= (e.clientX-rpx)*0.008;
+      phi = Math.max(.06, Math.min(Math.PI-.06, phi-(e.clientY-rpy)*0.008));
+      rpx=e.clientX; rpy=e.clientY; camUpdate(); return;
+    }
+    if(pDrag){
+      doPan(e.clientX-ppx, e.clientY-ppy);
+      ppx=e.clientX; ppy=e.clientY; return;
+    }
+    if(viewMode) return;
+    setMouse(e); rc.setFromCamera(msVec, camera);
+    currentHit = rayHitFloor(rc.ray);
+    updateHover(currentHit);
+    renderer.render(scene, camera);
+  });
+
+  window.addEventListener('mouseup', function(e){
+    if(e.button===2){ rDrag=false; return; }
+    if(e.button===1){ pDrag=false; return; }
+    if(e.button===0 && clickDown){
+      clickDown=false;
+      if(viewMode) return;
+      if(Math.abs(e.clientX-clickSx)+Math.abs(e.clientY-clickSy) > 8) return;
+      if(!currentHit) return;
+      if(currentHit.type==='boru'){
+        var exB=getBoru(currentHit);
+        setBoru(currentHit, exB?null:'boru');
+      }
+      else {
+        var ex=getPanel(currentHit);
+        if(!ex){ setPanel(currentHit,selType); if(selColor!==null) setPClr(currentHit,selColor); }
+        else if(ex in CYCLE){ setPanel(currentHit,CYCLE[ex]); }
+        else { setPanel(currentHit,null); delPClr(currentHit); }
+      }
+      rebuild();
+      setMouse(e); rc.setFromCamera(msVec, camera);
+      currentHit = rayHitFloor(rc.ray);
+      updateHover(currentHit);
+      renderer.render(scene, camera);
+    }
+  });
+
+  // Scroll wheel kaldırıldı — WASD ile çakışıyordu
+  renderer.domElement.addEventListener('wheel', function(e){ e.preventDefault(); }, {passive:false});
+
+  window.addEventListener('resize', function(){
+    var wrap = document.getElementById('viewport');
+    camera.aspect = wrap.clientWidth/wrap.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    camUpdate();
+  });
+
+  document.querySelectorAll('.pbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.pbtn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      selType = btn.dataset.type;
+      if(selType==='kafes_boru'){ selBoruStyle='kafes_boru'; selType='kafes_boru'; }
+      else if(selType==='boru'){ selBoruStyle='boru'; }
+      document.getElementById('io-type').textContent = TYPE_LABEL[selType]||selType.toUpperCase();
+      if(selType==='boru'||selType==='kafes_boru') document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
+      else setAxis(selAxis);
+    });
+  });
+
+  document.querySelectorAll('.axbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){ setAxis(btn.dataset.axis); });
+  });
+
+  document.querySelectorAll('.vbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){ setView(btn.dataset.view); });
+  });
+
+  document.getElementById('fl-up').onclick = function(){ setFloor(activeFloor+1); };
+  document.getElementById('fl-dn').onclick = function(){ setFloor(activeFloor-1); };
+
+  document.getElementById('btn-clear').onclick = function(){
+    if(!confirm('Tum panelleri sil?')) return;
+    sx={}; sy={}; sz={}; sxClr={}; syClr={}; szClr={}; boru={}; boruClr={}; boruStyle={};
+    rebuild(); currentHit=null; updateHover(null); camUpdate();
+  };
+
+  document.getElementById('btn-ara').addEventListener('click', toggleAra);
+
+  window.addEventListener('keydown', function(e){
+    if(e.key==='f'||e.key==='F'){ toggleView(); return; }
+    if(e.key==='c'||e.key==='C'){ focusFloor(); return; }
+    if(e.key==='m'||e.key==='M'){ toggleAra(); return; }
+    // Fly tuşları — her zaman aktif (edit + izleme)
+    if(['w','W','a','A','s','S','d','D','Shift'].indexOf(e.key)!==-1){
+      e.preventDefault(); flyKeys[e.key]=true; return;
+    }
+    if(e.key==='['||e.key==='ğ'||e.key==='PageDown'){ setFloor(activeFloor-1); return; }
+    if(e.key===']'||e.key==='ü'||e.key==='PageUp'){   setFloor(activeFloor+1); return; }
+    if(e.key==='r'||e.key==='R'){
+      if(selType==='boru'||selType==='kafes_boru'){
+        var bd=['x','z','y']; boruDir=bd[(bd.indexOf(boruDir)+1)%3];
+        document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
+        rc.setFromCamera(msVec, camera);
+        currentHit = rayHitFloor(rc.ray);
+        updateHover(currentHit);
+        renderer.render(scene, camera); return;
+      }
+      var order=['x','z','tavan','taban'];
+      setAxis(order[(order.indexOf(selAxis)+1)%4]); return;
+    }
+    if(e.key===' '&&!viewMode){
+      e.preventDefault();
+      if(!currentHit) return;
+      var ex=getPanel(currentHit);
+      if(!ex){ setPanel(currentHit,selType); }
+      else if(ex in CYCLE){ setPanel(currentHit,CYCLE[ex]); }
+      else { setPanel(currentHit,null); }
+      rebuild();
+      renderer.render(scene,camera);
+    }
+  });
+
+  window.addEventListener('keyup', function(e){
+    flyKeys[e.key] = false;
+  });
+}
+
+// ── SIDEBAR RESIZER
+function initResizer(){
+  var rsz = document.getElementById('resizer');
+  var sidebar = document.getElementById('sidebar');
+  var dragging = false, startX = 0, startW = 0;
+
+  rsz.addEventListener('mousedown', function(e){
+    dragging = true;
+    startX = e.clientX;
+    startW = sidebar.offsetWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    var w = Math.max(180, Math.min(420, startW + (startX - e.clientX)));
+    sidebar.style.width = w + 'px';
+    var wrap = document.getElementById('viewport');
+    camera.aspect = wrap.clientWidth / wrap.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    camUpdate();
+  });
+
+  window.addEventListener('mouseup', function(){
+    if(!dragging) return;
+    dragging = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+}
+
+// ── RENK PALETİ KURULUM
+function initColorPalette(){
+  var pal = document.getElementById('cpal');
+  FILAMENT.forEach(function(f){
+    var sw = document.createElement('div');
+    sw.className = 'csw';
+    sw.style.background = f.c;
+    sw.title = f.n;
+    sw.dataset.col = f.h;
+    pal.appendChild(sw);
+  });
+
+  pal.addEventListener('click', function(e){
+    var sw = e.target.closest('.csw'); if(!sw) return;
+    pal.querySelectorAll('.csw').forEach(function(s){ s.classList.remove('active'); });
+    sw.classList.add('active');
+    if(sw.dataset.col === 'auto') selColor = null;
+    else selColor = parseInt(sw.dataset.col);
+  });
+
+  document.getElementById('btn-ozel').addEventListener('click', function(){
+    document.getElementById('custom-col-input').click();
+  });
+  document.getElementById('custom-col-input').addEventListener('input', function(e){
+    var hex = e.target.value; // "#rrggbb"
+    var int = parseInt(hex.replace('#',''), 16);
+    selColor = int;
+    // geçici swatch güncelle veya ekle
+    var existing = pal.querySelector('.csw[data-col="custom"]');
+    if(!existing){
+      var sw = document.createElement('div');
+      sw.className = 'csw'; sw.dataset.col = 'custom'; sw.title = 'Özel';
+      pal.appendChild(sw); existing = sw;
+    }
+    existing.style.background = hex;
+    existing.dataset.col = int;
+    pal.querySelectorAll('.csw').forEach(function(s){ s.classList.remove('active'); });
+    existing.classList.add('active');
+  });
+}
+
+// ── KAYDET / YÜKLE
+var LS_KEY = 'habitatforge_v3_autosave';
+
+function saveDesign(){
+  var data = {
+    version:3,
+    sx:sx, sy:sy, sz:sz,
+    sxClr:sxClr, syClr:syClr, szClr:szClr,
+    boru:boru, boruClr:boruClr, boruStyle:boruStyle,
+    activeFloor:activeFloor
+  };
+  var json = JSON.stringify(data);
+  var blob = new Blob([json], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var d = new Date();
+  a.download = 'habitat_' + d.toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setStatus('KAYDEDİLDİ', '#6699ff', 'rgba(102,153,255,.4)');
+}
+
+function loadDesign(file){
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var d = JSON.parse(e.target.result);
+      sx=d.sx||{}; sy=d.sy||{}; sz=d.sz||{};
+      sxClr=d.sxClr||{}; syClr=d.syClr||{}; szClr=d.szClr||{};
+      boru=d.boru||{}; boruClr=d.boruClr||{}; boruStyle=d.boruStyle||{};
+      setFloor(d.activeFloor !== undefined ? d.activeFloor : 1);
+      setStatus('YÜKLENDİ', '#6699ff', 'rgba(102,153,255,.4)');
+    } catch(ex) {
+      setStatus('HATA: GEÇERSİZ DOSYA', '#ef476f', 'rgba(239,71,111,.3)');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function autoSave(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      sx:sx, sy:sy, sz:sz,
+      sxClr:sxClr, syClr:syClr, szClr:szClr,
+      boru:boru, boruClr:boruClr, boruStyle:boruStyle,
+      activeFloor:activeFloor
+    }));
+  } catch(ex){}
+}
+
+function autoLoad(){
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    var d = JSON.parse(raw);
+    sx=d.sx||{}; sy=d.sy||{}; sz=d.sz||{};
+    sxClr=d.sxClr||{}; syClr=d.syClr||{}; szClr=d.szClr||{};
+    boru=d.boru||{}; boruClr=d.boruClr||{}; boruStyle=d.boruStyle||{};
+    return d.activeFloor || 1;
+  } catch(ex){ return false; }
+}
+
+// ── BAŞLAT
+initThree();
+panelGroup = new THREE.Group(); connGroup = new THREE.Group();
+scene.add(panelGroup); scene.add(connGroup);
+initEvents();
+_flyId = requestAnimationFrame(flyStep);
+document.getElementById('boru-warn').addEventListener('click', function(){
+  if(!_warnPos) return;
+  camTgt.set(_warnPos[0], _warnPos[1], _warnPos[2]);
+  camUpdate();
+});
+document.getElementById('btn-save').addEventListener('click', saveDesign);
+document.getElementById('btn-load').addEventListener('click', function(){
+  document.getElementById('load-input').value='';
+  document.getElementById('load-input').click();
+});
+document.getElementById('load-input').addEventListener('change', function(e){
+  if(e.target.files[0]) loadDesign(e.target.files[0]);
+});
+initResizer();
+initColorPalette();
+var _savedFloor = autoLoad();
+setFloor(_savedFloor || 1);
+camUpdate();
+updateBOM();
+</script>
+</body>
+</html>
