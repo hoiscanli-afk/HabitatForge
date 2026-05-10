@@ -1,4 +1,4 @@
-# 🐹 HabitatForge v3
+# 🐹 HabitatForgeForHamsters
 
 **A browser-based modular hamster habitat designer — no installation needed.**
 
@@ -25,7 +25,7 @@ Drag, drop, and design multi-level hamster habitats. Export panel lists and prin
 
 ## 🚀 How to use
 
-1. Download `habitatforge_v3.html`
+1. Download `habitatforge_public.html`
 2. Open it in any modern browser — **no server needed**
 3. Start placing panels!
 

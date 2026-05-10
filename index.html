@@ -1,30 +1,28 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>HabitatForge Studio v3</title>
+<title>HabitatForge – Hamster Habitat Designer</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0d1117;color:#c9d1d9;font-family:'Courier New',monospace;
+body{background:#0d1117;color:#c9d1d9;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
   display:flex;height:100vh;overflow:hidden;user-select:none}
 #viewport{flex:1;position:relative;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
 
-#sidebar{width:210px;background:#161b22;border-left:1px solid #21262d;
+#sidebar{width:210px;background:#1c2333;border-left:1px solid #2d333b;
   display:flex;flex-direction:column;padding:12px;gap:8px;flex-shrink:0;overflow-y:auto}
 
 .logo{font-size:13px;font-weight:bold;letter-spacing:4px;margin-bottom:2px;
   border-bottom:1px solid #21262d;padding-bottom:8px;display:flex;align-items:baseline;gap:6px}
 .logo-h{color:#f72585}
 .logo-f{color:#4895ef}
-.gun-badge{font-size:7px;letter-spacing:2px;color:#ff6b35;border:1px solid #ff6b35;
-  padding:1px 4px;margin-left:auto;align-self:center;flex-shrink:0}
-.logo .ver{font-size:8px;color:#484f58;letter-spacing:1px}
+.logo .ver{font-size:8px;color:#6e7681;letter-spacing:1px}
 
 .sec{border:1px solid #21262d;padding:8px 10px}
-.sec-t{font-size:8px;letter-spacing:2px;color:#484f58;margin-bottom:6px}
+.sec-t{font-size:10px;letter-spacing:2px;color:#6e7681;margin-bottom:6px}
 
-/* Kat kontrolü */
+/* Floor control */
 .floor-ctrl{display:flex;align-items:center;gap:4px;margin-bottom:8px}
 .floor-btn{width:30px;height:30px;background:transparent;border:1px solid #21262d;
   color:#c9d1d9;font-family:inherit;font-size:13px;cursor:pointer;
@@ -32,19 +30,19 @@ canvas{display:block;width:100%;height:100%}
 .floor-btn:hover{border-color:#ffd166;color:#ffd166}
 .floor-num{flex:1;text-align:center;font-size:18px;font-weight:bold;color:#ffd166;
   border:1px solid #21262d;padding:3px;letter-spacing:2px;line-height:1.4}
-.floor-lbl{font-size:8px;color:#484f58;text-align:center;margin-bottom:2px}
+.floor-lbl{font-size:10px;color:#6e7681;text-align:center;margin-bottom:2px}
 
-/* Yön seçimi */
+/* Direction selection */
 .axrow{display:grid;grid-template-columns:1fr 1fr;gap:3px}
 .axbtn{padding:5px 2px;background:transparent;border:1px solid #21262d;
-  color:#484f58;font-family:inherit;font-size:8px;letter-spacing:1px;
+  color:#6e7681;font-family:inherit;font-size:10px;letter-spacing:1px;
   cursor:pointer;text-align:center;transition:all .1s}
 .axbtn:hover{border-color:#6699ff;color:#6699ff}
 .axbtn.active{border-color:#6699ff;color:#6699ff;background:rgba(102,153,255,.1)}
 
-/* Panel tipi */
+/* Panel type */
 .pbtn{display:flex;align-items:center;gap:6px;padding:5px 8px;border:1px solid #21262d;
-  background:transparent;color:#c9d1d9;font-family:inherit;font-size:10px;letter-spacing:1px;
+  background:transparent;color:#c9d1d9;font-family:inherit;font-size:12px;letter-spacing:1px;
   cursor:pointer;width:100%;margin-bottom:3px;transition:all .1s;text-align:left}
 .pbtn:last-child{margin-bottom:0}
 .pbtn.active{border-color:#ffd166;color:#ffd166;background:rgba(255,209,102,.06)}
@@ -52,19 +50,19 @@ canvas{display:block;width:100%;height:100%}
 
 /* BOM */
 .brow{display:flex;justify-content:space-between;align-items:center;
-  font-size:10px;padding:2px 0;border-bottom:1px solid #21262d}
+  font-size:11px;padding:2px 0;border-bottom:1px solid #21262d}
 .brow:last-child{border-bottom:none}
-.bval{font-size:12px;font-weight:bold;color:#ffd166}
-.bsec{font-size:8px;letter-spacing:2px;color:#484f58;padding:4px 0 2px}
+.bval{font-size:13px;font-weight:bold;color:#ffd166}
+.bsec{font-size:10px;letter-spacing:2px;color:#6e7681;padding:4px 0 2px}
 
-/* Kamera preset */
+/* Camera preset */
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:4px}
 .vbtn{padding:5px 2px;background:transparent;border:1px solid #21262d;
-  color:#484f58;font-family:inherit;font-size:9px;letter-spacing:1px;
+  color:#6e7681;font-family:inherit;font-size:11px;letter-spacing:1px;
   cursor:pointer;transition:all .1s;text-align:center}
 .vbtn:hover{border-color:#6699ff;color:#6699ff}
 
-/* Renk paleti */
+/* Color palette */
 .cpal{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
 .csw{width:22px;height:22px;border-radius:3px;cursor:pointer;border:2px solid transparent;
   font-size:5px;letter-spacing:.5px;color:#fff;display:flex;align-items:center;
@@ -72,7 +70,7 @@ canvas{display:block;width:100%;height:100%}
 .csw:hover{transform:scale(1.18);border-color:#fff !important}
 .csw.active{border-color:#fff !important;box-shadow:0 0 6px rgba(255,255,255,.5)}
 .cbtn{width:100%;padding:4px;background:transparent;border:1px solid #21262d;
-  color:#484f58;font-family:inherit;font-size:8px;letter-spacing:1px;cursor:pointer;
+  color:#6e7681;font-family:inherit;font-size:10px;letter-spacing:1px;cursor:pointer;
   transition:all .1s;margin-top:2px}
 .cbtn:hover{border-color:#f72585;color:#f72585}
 
@@ -81,51 +79,117 @@ canvas{display:block;width:100%;height:100%}
 #resizer:hover{background:#3ddc84}
 #resizer:active{background:#3ddc84}
 
-/* Alt butonlar */
+/* Bottom buttons */
 .btns-row{display:flex;gap:4px;margin-top:auto}
 .clearbtn{padding:7px;background:transparent;border:1px solid rgba(239,71,111,.3);
-  color:#ef476f;font-family:inherit;font-size:8px;letter-spacing:1px;
+  color:#ef476f;font-family:inherit;font-size:10px;letter-spacing:1px;
   cursor:pointer;flex:1;transition:all .1s}
 .clearbtn:hover{background:rgba(239,71,111,.1)}
 .viewbtn{padding:7px;background:transparent;border:1px solid rgba(61,220,132,.3);
-  color:#3ddc84;font-family:inherit;font-size:8px;letter-spacing:1px;
+  color:#3ddc84;font-family:inherit;font-size:10px;letter-spacing:1px;
   cursor:pointer;flex:1;transition:all .1s}
 .viewbtn:hover{background:rgba(61,220,132,.1)}
 
 /* Viewport overlay */
 #hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
-  font-size:9px;letter-spacing:1px;color:#484f58;background:#161b22;
+  font-size:10px;letter-spacing:1px;color:#6e7681;background:rgba(22,27,34,.85);
   border:1px solid #21262d;padding:4px 14px;pointer-events:none;white-space:nowrap}
-#status{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:2px;
+#bom-overlay{position:absolute;right:10px;top:50px;
+  background:rgba(22,27,34,.88);border:1px solid #21262d;
+  padding:8px 12px;pointer-events:none;font-size:10px;min-width:210px}
+#bom-overlay .bo-title{font-size:9px;letter-spacing:2px;color:#6e7681;
+  margin-bottom:6px;border-bottom:1px solid #21262d;padding-bottom:5px}
+#bom-overlay .bo-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+#bom-overlay .bo-sec{font-size:9px;letter-spacing:1px;color:#6e7681;padding:4px 0 3px}
+#bom-overlay .bo-row{display:flex;justify-content:space-between;padding:1px 0;color:#c9d1d9}
+#bom-overlay .bo-val{font-weight:bold;color:#ffd166}
+#bom-overlay .bo-tot{border-top:1px solid #21262d;margin-top:5px;padding-top:5px;
+  display:flex;justify-content:space-between;font-size:11px;font-weight:bold;color:#c9d1d9}
+#bom-overlay .bo-tot span{color:#ffd166}
+#status{position:absolute;top:10px;right:10px;font-size:11px;letter-spacing:2px;
   padding:3px 8px;border:1px solid;pointer-events:none;transition:all .2s}
-#info-overlay{position:absolute;top:10px;left:10px;font-size:9px;letter-spacing:1px;
+#info-overlay{position:absolute;top:10px;left:10px;font-size:11px;letter-spacing:1px;
   color:#aaa;background:#161b22;border:1px solid #21262d;
   padding:5px 12px;pointer-events:none;line-height:1.9}
 #exit-view{position:absolute;top:10px;right:10px;display:none;
   padding:5px 14px;background:#161b22;border:1px solid #3ddc84;color:#3ddc84;
-  font-family:'Courier New',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;z-index:10}
-#boru-warn{position:absolute;bottom:10px;left:10px;display:none;
+  font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;z-index:10}
+#boru-warn{position:absolute;bottom:36px;left:10px;display:none;
   padding:4px 10px;background:#161b22;border:1px solid #ef476f;color:#ef476f;
-  font-family:'Courier New',monospace;font-size:8px;letter-spacing:1px;
+  font-family:inherit;font-size:8px;letter-spacing:1px;
   cursor:pointer;z-index:10;transition:opacity .2s}
 #boru-warn:hover{background:rgba(239,71,111,.1)}
+
+/* Guide modal */
+#guide-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:none;align-items:center;justify-content:center;z-index:100}
+#guide-overlay.open{display:flex}
+#guide-box{background:#161b22;border:1px solid #30363d;width:520px;max-height:82vh;
+  display:flex;flex-direction:column;overflow:hidden}
+#guide-head{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid #21262d;flex-shrink:0}
+#guide-head h2{font-size:13px;letter-spacing:3px;color:#ffd166;font-weight:bold;margin:0}
+#guide-head span{font-size:9px;color:#6e7681;letter-spacing:1px}
+#guide-close{background:transparent;border:1px solid #30363d;color:#6e7681;
+  font-family:inherit;font-size:11px;padding:3px 9px;cursor:pointer;transition:all .15s}
+#guide-close:hover{border-color:#ef476f;color:#ef476f}
+#guide-body{overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:16px}
+.kil-sec{display:flex;flex-direction:column;gap:6px}
+.kil-sec-t{font-size:8px;letter-spacing:2px;color:#6e7681;padding-bottom:6px;
+  border-bottom:1px solid #21262d;margin-bottom:2px}
+.kil-row{display:flex;align-items:baseline;gap:8px;font-size:11px}
+.kil-key{background:#0d1117;border:1px solid #30363d;color:#c9d1d9;
+  padding:2px 7px;font-size:9px;letter-spacing:1px;white-space:nowrap;flex-shrink:0}
+.kil-desc{color:#8b949e;font-size:10px;line-height:1.5}
+.kil-tip{background:rgba(255,209,102,.06);border-left:2px solid #ffd166;
+  padding:7px 10px;font-size:10px;color:#8b949e;line-height:1.6}
+.kil-tip b{color:#ffd166}
+
+/* Guide button */
+.helpbtn{padding:7px;background:transparent;border:1px solid #21262d;
+  color:#6e7681;font-family:inherit;font-size:10px;letter-spacing:1px;
+  cursor:pointer;width:100%;transition:all .1s;margin-top:2px}
+.helpbtn:hover{border-color:#ffd166;color:#ffd166}
 </style>
 </head>
 <body>
 <div id="viewport">
   <canvas id="c"></canvas>
-  <div id="hint">Sol klik: panel · R: yon · [/]: kat · M: ara mod · Sag sur: dondur · Orta: kaydir · F: izleme</div>
-  <div id="status">HAZIR</div>
+  <div id="hint">Left click: panel · R: rotate · [/]: floor · M: mid mode · Right drag: rotate · Middle: pan · F: view</div>
+  <div id="status">READY</div>
   <div id="info-overlay">
-    KAT: <span id="io-floor" style="color:#ffd166;font-weight:bold">0</span>
+    FLOOR: <span id="io-floor" style="color:#ffd166;font-weight:bold">0</span>
     &nbsp;·&nbsp;
-    YON: <span id="io-axis" style="color:#6699ff">DUV-X</span><br>
-    TIP: <span id="io-type" style="color:#c9d1d9">DUZ</span>
+    DIR: <span id="io-axis" style="color:#6699ff">WALL-X</span><br>
+    TYPE: <span id="io-type" style="color:#c9d1d9">FLAT</span>
     &nbsp;·&nbsp;
-    <span id="io-ara" style="color:#484f58">ARA:OFF</span>
+    <span id="io-ara" style="color:#6e7681">MID:OFF</span>
   </div>
-  <button id="exit-view" onclick="toggleView()">✕ KAPAT</button>
-  <div id="boru-warn">⚠ BORU EŞLEŞMİYOR</div>
+  <button id="exit-view" onclick="toggleView()">✕ CLOSE</button>
+  <div id="boru-warn">⚠ TUBE MISMATCH</div>
+  <div id="bom-overlay">
+    <div class="bo-title">PARTS LIST</div>
+    <div class="bo-grid">
+      <div>
+        <div class="bo-sec">PANELS</div>
+        <div class="bo-row"><span>Flat</span><span class="bo-val" id="b-duz">0</span></div>
+        <div class="bo-row"><span>Grid</span><span class="bo-val" id="b-par">0</span></div>
+        <div class="bo-row"><span>Half</span><span class="bo-val" id="b-yar">0</span></div>
+        <div class="bo-row"><span>Door</span><span class="bo-val" id="b-kap">0</span></div>
+        <div class="bo-row"><span>Tunnel</span><span class="bo-val" id="b-tun">0</span></div>
+        <div class="bo-row"><span>Half Door</span><span class="bo-val" id="b-ykap">0</span></div>
+        <div class="bo-row"><span>Water/Feed</span><span class="bo-val" id="b-sul">0</span></div>
+        <div class="bo-row"><span>Tube</span><span class="bo-val" id="b-bor">0</span></div>
+        <div class="bo-row"><span>K.Tube</span><span class="bo-val" id="b-kbor">0</span></div>
+      </div>
+      <div>
+        <div class="bo-sec">CONNECTORS</div>
+        <div class="bo-row"><span>Connector</span><span class="bo-val" id="b-ctot">0</span></div>
+        <div class="bo-row"><span>B.Ring</span><span class="bo-val" id="b-bhalka">0</span></div>
+      </div>
+    </div>
+    <div class="bo-tot"><span>PANEL TOTAL</span><span id="b-tot">0</span></div>
+  </div>
 </div>
 
 <div id="resizer"></div>
@@ -134,152 +198,173 @@ canvas{display:block;width:100%;height:100%}
     <span class="logo-h">HABITAT</span><span class="logo-f">FORGE</span><span class="ver">v3</span>
   </div>
 
-  <!-- FİLAMAN RENGİ -->
+  <!-- FILAMENT COLOR -->
   <div class="sec">
-    <div class="sec-t">FİLAMAN RENGİ</div>
+    <div class="sec-t">FILAMENT COLOR</div>
     <div class="cpal" id="cpal">
-      <div class="csw active" data-col="auto" title="Tip rengi (otomatik)" style="background:linear-gradient(135deg,#4466cc,#ff4444,#3ddc84,#ffd166);border-color:#484f58">AUTO</div>
+      <div class="csw active" data-col="auto" title="Type color (auto)" style="background:linear-gradient(135deg,#4466cc,#ff4444,#3ddc84,#ffd166);border-color:#6e7681">AUTO</div>
     </div>
-    <button class="cbtn" id="btn-ozel">+ ÖZEL RENK</button>
+    <button class="cbtn" id="btn-ozel">+ CUSTOM COLOR</button>
     <input type="color" id="custom-col-input" style="display:none">
   </div>
 
-  <!-- KAT -->
+  <!-- FLOOR -->
   <div class="sec">
-    <div class="sec-t">AKTIF KAT</div>
-    <div class="floor-lbl">YUK. / ASAGI</div>
+    <div class="sec-t">ACTIVE FLOOR</div>
+    <div class="floor-lbl">UP / DOWN</div>
     <div class="floor-ctrl">
       <button class="floor-btn" id="fl-up">▲</button>
       <div class="floor-num" id="fl-num">0</div>
       <button class="floor-btn" id="fl-dn">▼</button>
     </div>
 
-    <div class="sec-t">PANEL YONU &nbsp;<span style="color:#21262d">( R )</span></div>
+    <div class="sec-t">PANEL DIR &nbsp;<span style="color:#21262d">( R )</span></div>
     <div class="axrow">
-      <button class="axbtn active" data-axis="x">DUV-X</button>
-      <button class="axbtn" data-axis="z">DUV-Z</button>
-      <button class="axbtn" data-axis="tavan">TAVAN</button>
-      <button class="axbtn" data-axis="taban">TABAN</button>
+      <button class="axbtn active" data-axis="x">WALL-X</button>
+      <button class="axbtn" data-axis="z">WALL-Z</button>
+      <button class="axbtn" data-axis="tavan">CEILING</button>
+      <button class="axbtn" data-axis="taban">FLOOR</button>
     </div>
-    <button class="axbtn" id="btn-ara" style="width:100%;margin-top:5px;color:#484f58">ARA MOD: KAPALI &nbsp;<span style="color:#21262d">( M )</span></button>
+    <button class="axbtn" id="btn-ara" style="width:100%;margin-top:5px;color:#6e7681">MID MODE: OFF &nbsp;<span style="color:#21262d">( M )</span></button>
   </div>
 
-  <!-- KAMERA -->
+  <!-- CAMERA -->
   <div class="sec">
-    <div class="sec-t">KAMERA</div>
+    <div class="sec-t">CAMERA</div>
     <div class="vgrid">
       <button class="vbtn" data-view="iso">ISO</button>
-      <button class="vbtn" data-view="top">UST</button>
-      <button class="vbtn" data-view="front">ON</button>
-      <button class="vbtn" data-view="right">SAG</button>
-    </div>
-    <div style="font-size:8px;color:#484f58;margin-top:7px;line-height:1.9">
-      R &nbsp;·&nbsp; yon degistir<br>
-      [ / ] &nbsp;·&nbsp; kat yukari / asagi<br>
-      M &nbsp;·&nbsp; ara panel modu<br>
-      Sol klik &nbsp;·&nbsp; panel koy/sil<br>
-      Sag sur &nbsp;·&nbsp; dondur<br>
-      Orta sur &nbsp;·&nbsp; kaydir<br>
-      F &nbsp;·&nbsp; izleme modu
+      <button class="vbtn" data-view="top">TOP</button>
+      <button class="vbtn" data-view="front">FRONT</button>
+      <button class="vbtn" data-view="right">RIGHT</button>
     </div>
   </div>
 
-  <!-- PANEL TIPI -->
+  <!-- PANEL TYPE -->
   <div class="sec">
-    <div class="sec-t">PANEL TIPI</div>
+    <div class="sec-t">PANEL TYPE</div>
     <button class="pbtn active" data-type="duz">
-      <div class="pdot" style="background:#4466cc55;border:1px solid #4466cc"></div>DUZ
+      <div class="pdot" style="background:#4466cc55;border:1px solid #4466cc"></div>FLAT
     </button>
     <button class="pbtn" data-type="parmaklik">
-      <div class="pdot" style="background:#3ddc8455;border:1px solid #3ddc84"></div>PARMAKLIKLI
+      <div class="pdot" style="background:#3ddc8455;border:1px solid #3ddc84"></div>GRID
     </button>
     <button class="pbtn" data-type="yari">
-      <div class="pdot" style="background:#9966cc55;border:1px solid #9966cc"></div>YARI PARMAKLIK
+      <div class="pdot" style="background:#9966cc55;border:1px solid #9966cc"></div>HALF GRID
     </button>
     <button class="pbtn" data-type="kapi">
-      <div class="pdot" style="background:#ffd16655;border:1px solid #ffd166"></div>KAPI
+      <div class="pdot" style="background:#ffd16655;border:1px solid #ffd166"></div>DOOR
     </button>
     <button class="pbtn" data-type="tunel">
-      <div class="pdot" style="background:#ff444455;border:1px solid #ff4444"></div>TUNEL GIRISI
+      <div class="pdot" style="background:#ff444455;border:1px solid #ff4444"></div>TUNNEL
     </button>
     <button class="pbtn" data-type="yari_kapi">
-      <div class="pdot" style="background:#ff8c0055;border:1px solid #ff8c00"></div>YARI KAPI
+      <div class="pdot" style="background:#ff8c0055;border:1px solid #ff8c00"></div>HALF DOOR
     </button>
     <button class="pbtn" data-type="suluk">
-      <div class="pdot" style="background:#00c8ff55;border:1px solid #00c8ff"></div>SULUK/YEM
+      <div class="pdot" style="background:#00c8ff55;border:1px solid #00c8ff"></div>WATER/FEED
     </button>
     <button class="pbtn" data-type="boru">
-      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900"></div>BORU
+      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900"></div>TUBE
     </button>
     <button class="pbtn" data-type="kafes_boru">
-      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900;border-radius:50%"></div>K.BORU
+      <div class="pdot" style="background:#ff990055;border:1px solid #ff9900;border-radius:50%"></div>K.TUBE
     </button>
-  </div>
-
-  <!-- BOM -->
-  <div class="sec" style="flex:1;overflow-y:auto;min-height:0">
-    <div class="sec-t">PARCA LISTESI</div>
-    <div class="bsec">PANELLER</div>
-    <div class="brow"><span>Düz</span><span class="bval" id="b-duz">0</span></div>
-    <div class="brow"><span>Parmaklıklı</span><span class="bval" id="b-par">0</span></div>
-    <div class="brow"><span>Yarı</span><span class="bval" id="b-yar">0</span></div>
-    <div class="brow"><span>Ara Panel</span><span class="bval" id="b-ara">0</span></div>
-    <div class="brow"><span>Kapı</span><span class="bval" id="b-kap">0</span></div>
-    <div class="brow"><span>Tunel</span><span class="bval" id="b-tun">0</span></div>
-    <div class="brow"><span>Yarı Kapı</span><span class="bval" id="b-ykap">0</span></div>
-    <div class="brow"><span>Suluk/Yem</span><span class="bval" id="b-sul">0</span></div>
-    <div class="brow"><span>Boru</span><span class="bval" id="b-bor">0</span></div>
-    <div class="brow"><span>K.Boru</span><span class="bval" id="b-kbor">0</span></div>
-    <div class="bsec">BAGLANTILAR</div>
-    <div class="brow"><span>Son (1 kol)</span><span class="bval" id="b-c1">0</span></div>
-    <div class="brow"><span>Iki kol</span><span class="bval" id="b-c2">0</span></div>
-    <div class="brow"><span>T (3 kol)</span><span class="bval" id="b-c3">0</span></div>
-    <div class="brow"><span>+ (4 kol)</span><span class="bval" id="b-c4">0</span></div>
-    <div class="brow"><span>5+ kol</span><span class="bval" id="b-c5">0</span></div>
-    <div class="brow" style="margin-top:4px;padding-top:4px;border-top:1px solid #21262d">
-      <span style="font-weight:bold">TOP. PANEL</span>
-      <span class="bval" id="b-tot">0</span>
-    </div>
-    <div class="brow">
-      <span style="font-weight:bold">TOP. BAGLANTI</span>
-      <span class="bval" id="b-ctot">0</span>
-    </div>
   </div>
 
   <div class="btns-row" style="margin-bottom:4px">
-    <button class="viewbtn" id="btn-save" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8659; KAYDET</button>
-    <button class="viewbtn" id="btn-load" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8657; YÜKLE</button>
+    <button class="viewbtn" id="btn-save" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8659; SAVE</button>
+    <button class="viewbtn" id="btn-load" style="border-color:rgba(102,153,255,.4);color:#6699ff">&#8657; LOAD</button>
   </div>
   <div class="btns-row">
-    <button class="viewbtn" onclick="toggleView()">&#9654; IZLE</button>
-    <button class="clearbtn" id="btn-clear">&#9888; TEMIZLE</button>
+    <button class="viewbtn" onclick="toggleView()">&#9654; VIEW</button>
+    <button class="clearbtn" id="btn-clear">&#9888; CLEAR</button>
   </div>
+  <button class="helpbtn" onclick="document.getElementById('guide-overlay').classList.add('open')">? USER GUIDE</button>
   <input type="file" id="load-input" accept=".json" style="display:none">
+</div>
+
+<!-- User Guide Modal -->
+<div id="guide-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div id="guide-box">
+    <div id="guide-head">
+      <h2>USER GUIDE</h2>
+      <span>HabitatForge v3</span>
+      <button id="guide-close" onclick="document.getElementById('guide-overlay').classList.remove('open')">✕ CLOSE</button>
+    </div>
+    <div id="guide-body">
+
+      <div class="kil-sec">
+        <div class="kil-sec-t">CAMERA CONTROLS</div>
+        <div class="kil-row"><span class="kil-key">Right Click + Drag</span><span class="kil-desc">Rotate view (FPS style — camera stays in place)</span></div>
+        <div class="kil-row"><span class="kil-key">W A S D</span><span class="kil-desc">Move camera forward / left / backward / right</span></div>
+        <div class="kil-row"><span class="kil-key">Space</span><span class="kil-desc">Move camera down</span></div>
+        <div class="kil-row"><span class="kil-key">Shift</span><span class="kil-desc">Move camera up</span></div>
+        <div class="kil-row"><span class="kil-key">Scroll</span><span class="kil-desc">Zoom forward / backward in view direction</span></div>
+        <div class="kil-row"><span class="kil-key">Middle Click + Drag</span><span class="kil-desc">Pan the view</span></div>
+        <div class="kil-row"><span class="kil-key">ISO / TOP / FRONT / RIGHT</span><span class="kil-desc">Switch to preset camera angles (right panel)</span></div>
+      </div>
+
+      <div class="kil-sec">
+        <div class="kil-sec-t">PANEL PLACEMENT</div>
+        <div class="kil-row"><span class="kil-key">Left Click</span><span class="kil-desc">Place panel — clicking an occupied cell cycles the type, deletes on last type</span></div>
+        <div class="kil-row"><span class="kil-key">R</span><span class="kil-desc">Rotate panel direction (WALL-X → WALL-Z → CEILING)</span></div>
+        <div class="kil-row"><span class="kil-key">[ ]</span><span class="kil-desc">Change active floor (down / up)</span></div>
+        <div class="kil-row"><span class="kil-key">M</span><span class="kil-desc">Mid mode — place panels between two grid points</span></div>
+        <div class="kil-tip"><b>What does Mid Mode do?</b> Lets you place panels between normal grid points. This allows you to add a <b>mid-floor</b> between two full floors, or a <b>mid-wall</b> between two walls — ideal for hamster passages between smaller compartments.</div>
+      </div>
+
+      <div class="kil-sec">
+        <div class="kil-sec-t">PANEL TYPES</div>
+        <div class="kil-row"><span class="kil-key">FLAT</span><span class="kil-desc">Solid closed panel — wall, ceiling, floor</span></div>
+        <div class="kil-row"><span class="kil-key">GRID</span><span class="kil-desc">Grid panel — air circulation, visibility</span></div>
+        <div class="kil-row"><span class="kil-key">DOOR</span><span class="kil-desc">Door panel — access door</span></div>
+        <div class="kil-row"><span class="kil-key">HALF</span><span class="kil-desc">Half-open panel</span></div>
+        <div class="kil-row"><span class="kil-key">HALF DOOR</span><span class="kil-desc">Half door panel</span></div>
+        <div class="kil-row"><span class="kil-key">TUNNEL</span><span class="kil-desc">Panel with tunnel connection point</span></div>
+        <div class="kil-row"><span class="kil-key">WATER/FEED</span><span class="kil-desc">Water bottle and feeder slot panel</span></div>
+        <div class="kil-row"><span class="kil-key">TUBE X / TUBE Z</span><span class="kil-desc">Horizontal tunnel tube — connects two tunnel entry panels</span></div>
+      </div>
+
+      <div class="kil-sec">
+        <div class="kil-sec-t">SAVE / LOAD</div>
+        <div class="kil-row"><span class="kil-key">↓ SAVE</span><span class="kil-desc">Download design as JSON file</span></div>
+        <div class="kil-row"><span class="kil-key">↑ LOAD</span><span class="kil-desc">Open a previously saved JSON file</span></div>
+        <div class="kil-tip">Browser auto-saves — your design is preserved even if you close the tab. Use JSON to transfer to other computers.</div>
+      </div>
+
+      <div class="kil-sec">
+        <div class="kil-sec-t">TIPS</div>
+        <div class="kil-tip">If a tube is unmatched, an orange warning appears at the bottom left — click it to focus the camera on the mismatched area.</div>
+        <div class="kil-tip">Filament color can be set per panel — use it to plan colors for your real print.</div>
+        <div class="kil-tip">The <b>▶ VIEW</b> button hides the sidebar, giving the full area to the 3D view. Click <b>✕ CLOSE</b> at the top right to exit.</div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ── SABİTLER
-var STEP   = 120;  // mm cinsinden yatay grid adımı
-var STEP_V = 60;   // dikey grid adımı (yarım kat = 55mm panel için)
-var PSZ    = 108;  // panel kenar boyu mm
-var PT     = 3;    // panel kalınlığı mm (veri/connector için)
-var VPT    = 10;   // görsel panel kalınlığı (sadece render)
-var CSZ    = 11;   // connector küre yarıçapı
-var GRID_N = 20;   // 19 segment × 120 = 2280 mm ≈ 2.3 m
+// ── CONSTANTS
+var STEP   = 120;
+var STEP_V = 60;
+var PSZ    = 108;
+var PT     = 3;
+var VPT    = 10;
+var CSZ    = 11;
+var GRID_N = 20;
 
 function off(){ return -((GRID_N-1)*STEP)/2; }
 function offV(){ return -((GRID_N-1)*STEP_V)/2; }
 
-// ── VERİ (panel depolar)
+// ── DATA
 var sx={}, sy={}, sz={};
-var boru={};       // key="px_py_pz", val='x'|'y'|'z'
-var boruClr={};    // key="px_py_pz", val hex renk
-var boruStyle={};  // key="px_py_pz", val='boru'|'kafes_boru'
+var boru={};
+var boruClr={};
+var boruStyle={};
 var boruDir='x';
-var selBoruStyle='boru'; // 'boru' | 'kafes_boru'
+var selBoruStyle='boru';
 function sk(a,b,c){ return a+'_'+b+'_'+c; }
-// hit → fiziksel junction indeksleri (her yön için STEP birimi)
 function hitToPhys(h){
   if(h.dir==='x') return [h.jx+1, h.jy,   h.jz  ];
   if(h.dir==='z') return [h.jx,   h.jy,   h.jz+1];
@@ -301,17 +386,18 @@ function boruPos(h){
   var O=off(), p=hitToPhys(h);
   return [O+p[0]*STEP, O+p[1]*STEP, O+p[2]*STEP];
 }
-// ── FİLAMAN RENKLERİ
+
+// ── FILAMENT COLORS
 var FILAMENT = [
-  {n:'Beyaz',  h:0xf2f2f0, c:'#f2f2f0'}, {n:'Gri',    h:0x888899, c:'#888899'},
-  {n:'Siyah',  h:0x1a1c22, c:'#1a1c22'}, {n:'Krem',   h:0xf5deb3, c:'#f5deb3'},
-  {n:'Kırmızı',h:0xe63946, c:'#e63946'}, {n:'Turuncu',h:0xff6b35, c:'#ff6b35'},
-  {n:'Sarı',   h:0xffd166, c:'#ffd166'}, {n:'Lime',   h:0xaadd00, c:'#aadd00'},
-  {n:'Yeşil',  h:0x06d6a0, c:'#06d6a0'}, {n:'Turkuaz',h:0x00b4d8, c:'#00b4d8'},
-  {n:'Mavi',   h:0x4361ee, c:'#4361ee'}, {n:'Mor',    h:0x9b5de5, c:'#9b5de5'},
-  {n:'Pembe',  h:0xf72585, c:'#f72585'}, {n:'Kahve',  h:0x8b5e3c, c:'#8b5e3c'},
+  {n:'White',  h:0xf2f2f0, c:'#f2f2f0'}, {n:'Gray',   h:0x888899, c:'#888899'},
+  {n:'Black',  h:0x1a1c22, c:'#1a1c22'}, {n:'Cream',  h:0xf5deb3, c:'#f5deb3'},
+  {n:'Red',    h:0xe63946, c:'#e63946'}, {n:'Orange', h:0xff6b35, c:'#ff6b35'},
+  {n:'Yellow', h:0xffd166, c:'#ffd166'}, {n:'Lime',   h:0xaadd00, c:'#aadd00'},
+  {n:'Green',  h:0x06d6a0, c:'#06d6a0'}, {n:'Teal',   h:0x00b4d8, c:'#00b4d8'},
+  {n:'Blue',   h:0x4361ee, c:'#4361ee'}, {n:'Purple', h:0x9b5de5, c:'#9b5de5'},
+  {n:'Pink',   h:0xf72585, c:'#f72585'}, {n:'Brown',  h:0x8b5e3c, c:'#8b5e3c'},
 ];
-var selColor = null;   // null = tip rengi, int = override hex
+var selColor = null;
 var sxClr={}, syClr={}, szClr={};
 function getPClr(h){ return h.axis==='x'?sxClr[sk(h.jx,h.jy,h.jz)]:h.axis==='y'?syClr[sk(h.jx,h.jy,h.jz)]:szClr[sk(h.jx,h.jy,h.jz)]; }
 function setPClr(h,c){ if(h.axis==='x') sxClr[sk(h.jx,h.jy,h.jz)]=c; else if(h.axis==='y') syClr[sk(h.jx,h.jy,h.jz)]=c; else szClr[sk(h.jx,h.jy,h.jz)]=c; }
@@ -327,14 +413,14 @@ function setZ(a,b,c,t){ if(t) sz[sk(a,b,c)]=t; else delete sz[sk(a,b,c)]; }
 function getPanel(h){ return h.axis==='x'?getX(h.jx,h.jy,h.jz):h.axis==='y'?getY(h.jx,h.jy,h.jz):getZ(h.jx,h.jy,h.jz); }
 function setPanel(h,t){ if(h.axis==='x') setX(h.jx,h.jy,h.jz,t); else if(h.axis==='y') setY(h.jx,h.jy,h.jz,t); else setZ(h.jx,h.jy,h.jz,t); }
 
-// ── DURUM
+// ── STATE
 var activeFloor = 0;
-var selAxis = 'x';     // 'x' | 'z' | 'tavan' | 'taban'
+var selAxis = 'x';
 var selType = 'duz';
 var viewMode = false;
-var araMode = false;   // ara panel modu: snap pozisyonları STEP/2'ye kayar
+var araMode = false;
 
-// ── RENKLER
+// ── COLORS
 var PCOL = {
   duz:0x4466cc,
   parmaklik:0x3ddc84, parmaklik1:0x3ddc84,
@@ -345,18 +431,17 @@ var PCOL = {
   suluk:0x00c8ff
 };
 var CCOL = [0, 0x555566, 0x33aa66, 0xddcc22, 0xff8822, 0xff4444, 0xff44ff];
-var AXIS_LABEL = {x:'DUV-X', z:'DUV-Z', tavan:'TAVAN', taban:'TABAN'};
+var AXIS_LABEL = {x:'WALL-X', z:'WALL-Z', tavan:'CEILING', taban:'FLOOR'};
 var TYPE_LABEL = {
-  duz:'DUZ',
-  parmaklik:'PARMAKLIK ↕', parmaklik1:'PARMAKLIK ↔',
-  yari:'YARI ↓dolu', yari1:'YARI →dolu', yari2:'YARI ↑dolu', yari3:'YARI ←dolu',
-  kapi:'KAPI ↓', kapi1:'KAPI ←', kapi2:'KAPI ↑', kapi3:'KAPI →',
-  tunel:'TUNEL (dış)', tunel1:'TUNEL (iç)',
-  yari_kapi:'Y.KAPI ↓', yari_kapi1:'Y.KAPI →', yari_kapi2:'Y.KAPI ↑', yari_kapi3:'Y.KAPI ←',
-  suluk:'SULUK/YEM',
-  kafes_boru:'K.BORU'
+  duz:'FLAT',
+  parmaklik:'GRID ↕', parmaklik1:'GRID ↔',
+  yari:'HALF ↓full', yari1:'HALF →full', yari2:'HALF ↑full', yari3:'HALF ←full',
+  kapi:'DOOR ↓', kapi1:'DOOR ←', kapi2:'DOOR ↑', kapi3:'DOOR →',
+  tunel:'TUNNEL (out)', tunel1:'TUNNEL (in)',
+  yari_kapi:'H.DOOR ↓', yari_kapi1:'H.DOOR →', yari_kapi2:'H.DOOR ↑', yari_kapi3:'H.DOOR ←',
+  suluk:'WATER/FEED',
+  kafes_boru:'K.TUBE'
 };
-// tıklama döngüsü: hangi tip neye dönüşür (null = sil)
 var CYCLE = {
   yari:'yari1', yari1:'yari2', yari2:'yari3', yari3:null,
   parmaklik:'parmaklik1', parmaklik1:null,
@@ -365,16 +450,14 @@ var CYCLE = {
   yari_kapi:'yari_kapi1', yari_kapi1:'yari_kapi2', yari_kapi2:'yari_kapi3', yari_kapi3:null
 };
 
-// Belirtilen grid noktasında herhangi bir eksen paneli var mı?
 function anyPanel(jx, jy, jz){
   return !!(getX(jx,jy,jz)||getZ(jx,jy,jz)||getY(jx,jy,jz)||getY(jx,Math.max(0,jy-1),jz));
 }
 
-// ── PANEL YARDIMCI FONKSİYONLARI
-// SCAD panel-lokal (px,py,pz,pw,pth,pd) → Three.js axis'e göre merkez+boyut
+// ── PANEL HELPERS
 function pOff(axis, px, py, pz, pw, pth, pd) {
   var cx = px + pw/2 - PSZ/2;
-  var cy = py + pth/2 - pth/2;  // VPT ile de merkez 0'da kalır
+  var cy = py + pth/2 - pth/2;
   var cz = pz + pd/2 - PSZ/2;
   if(axis==='y') return {gx:pw, gy:pth, gz:pd, ox:cx, oy:cy, oz:cz};
   if(axis==='x') return {gx:pth, gy:pw, gz:pd, ox:cy, oy:cx, oz:cz};
@@ -396,7 +479,6 @@ function addCyl(G, axis, pcx, pcz, r, op) {
   else { m.rotation.x = Math.PI/2; m.position.set(ox, oz, 0); }
   G.add(m);
 }
-// yari_kapi için yarım silindir (thetaStart eksen+variante göre seçilir)
 var YKAPI_THETA = {
   yari_kapi:  {y:0,             x:0,             z:Math.PI},
   yari_kapi1: {y:Math.PI/2,     x:Math.PI/2,     z:Math.PI/2},
@@ -524,46 +606,28 @@ function buildPanelGroup(type, axis, col, op) {
   return G;
 }
 
-// ── CONNECTOR GEOMETRİSİ (32×32×3mm plaka, 3 eksen yönü)
+// ── CONNECTOR GEOMETRY
 var _cGX=null, _cGY=null, _cGZ=null;
 function cGeoX(){ if(!_cGX){ var s=32*(PSZ/110); _cGX=new THREE.BoxGeometry(PT,s,s); } return _cGX; }
 function cGeoY(){ if(!_cGY){ var s=32*(PSZ/110); _cGY=new THREE.BoxGeometry(s,PT,s); } return _cGY; }
 function cGeoZ(){ if(!_cGZ){ var s=32*(PSZ/110); _cGZ=new THREE.BoxGeometry(s,s,PT); } return _cGZ; }
 
-// ── BORU GEOMETRİSİ
+// ── TUBE GEOMETRY
 function buildKafesBoru(dir, col, op) {
-  var S=PSZ/110, r=30*S, len=100*S, bT=1.8*S;
-  var G=new THREE.Group();
-  var mat=new THREE.MeshPhongMaterial({color:col,shininess:60,transparent:true,opacity:op});
-  // Boyuna çubuklar — 8 adet
-  var barGeo=new THREE.CylinderGeometry(bT,bT,len,6);
-  for(var k=0;k<8;k++){
-    var ang=k*Math.PI/4, bx=r*Math.cos(ang), bz=r*Math.sin(ang);
-    var bar=new THREE.Mesh(barGeo,mat.clone());
-    if(dir==='x'){ bar.rotation.z=Math.PI/2; bar.position.set(0,bx,bz); }
-    else if(dir==='z'){ bar.rotation.x=Math.PI/2; bar.position.set(bx,bz,0); }
-    else { bar.position.set(bx,0,bz); }
-    G.add(bar);
-  }
-  // Halka çemberleri — 6 adet
-  var ringGeo=new THREE.TorusGeometry(r,bT*1.2,6,24);
-  for(var i=0;i<6;i++){
-    var t=(i/5-0.5)*len;
-    var ring=new THREE.Mesh(ringGeo,mat.clone());
-    if(dir==='x'){ ring.rotation.y=Math.PI/2; ring.position.set(t,0,0); }
-    else if(dir==='z'){ ring.rotation.x=Math.PI/2; ring.position.set(0,0,t); }
-    else { ring.position.set(0,t,0); }
-    G.add(ring);
-  }
-  return G;
+  var S=PSZ/110, r=30*S, len=100*S;
+  var geo = new THREE.CylinderGeometry(r, r, len, 8, 4);
+  var edges = new THREE.EdgesGeometry(geo);
+  var mat = new THREE.LineBasicMaterial({color:col, transparent:true, opacity:op});
+  var mesh = new THREE.LineSegments(edges, mat);
+  if(dir==='x') mesh.rotation.z = Math.PI/2;
+  else if(dir==='z') mesh.rotation.x = Math.PI/2;
+  return mesh;
 }
 function buildBoruMesh(dir, col, op) {
   var S = PSZ/110, r=30*S, ri=24*S, len=100*S;
   var G = new THREE.Group();
-  // dış tüp — solid kapaklı, kesinlikle görünür
   var matOut = new THREE.MeshPhongMaterial({color:col, shininess:80, transparent:true, opacity:op});
   G.add(new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 24), matOut));
-  // iç koyu silindir biraz uzun → uçlardan delik izlenimi
   var matIn = new THREE.MeshPhongMaterial({color:0x0d1117, shininess:0, transparent:true, opacity:op});
   G.add(new THREE.Mesh(new THREE.CylinderGeometry(ri, ri, len+8, 24), matIn));
   if(dir==='x') G.rotation.z = Math.PI/2;
@@ -571,7 +635,6 @@ function buildBoruMesh(dir, col, op) {
   return G;
 }
 
-// tünel birleştirme halkası görsel
 function buildTunelBag(dir, col, op){
   var S=PSZ/110, r=37*S, len=18*S;
   var G=new THREE.Group();
@@ -582,14 +645,13 @@ function buildTunelBag(dir, col, op){
   return G;
 }
 
-// hover için basit box (tip bağımsız)
 function panelGeom(axis){
   if(axis==='x') return new THREE.BoxGeometry(VPT+2, PSZ, PSZ);
   if(axis==='y') return new THREE.BoxGeometry(PSZ, VPT+2, PSZ);
   return new THREE.BoxGeometry(PSZ, PSZ, VPT+2);
 }
 
-// ── PANEL POZİSYONU
+// ── PANEL POSITION
 function panelPos(h){
   var O=off();
   if(h.axis==='x') return [O+h.jx*STEP+STEP/2, O+h.jy*STEP,        O+h.jz*STEP];
@@ -597,10 +659,9 @@ function panelPos(h){
   return                   [O+h.jx*STEP,         O+h.jy*STEP,        O+h.jz*STEP+STEP/2];
 }
 
-// ── AKTIF KAT RAYCAST
+// ── RAYCAST
 function rayHitFloor(ray){
   var O = off();
-  // boru modu: panel junction'larına hizalı snap
   if(selType === 'boru' || selType === 'kafes_boru'){
     var oy=ray.origin.y, dy=ray.direction.y;
     if(Math.abs(dy)<1e-6) return null;
@@ -608,17 +669,14 @@ function rayHitFloor(ray){
     var t=(yPlane2-oy)/dy; if(t<5||t>40000) return null;
     var hx=ray.origin.x+t*ray.direction.x, hz=ray.origin.z+t*ray.direction.z;
     if(boruDir==='x'){
-      // merkez X=O+(jx+1)*STEP, Y=O+jy*STEP, Z=O+jz*STEP
       var ix=Math.max(1,Math.min(GRID_N-2,Math.round((hx-O)/STEP)));
       var jz=Math.max(0,Math.min(GRID_N-1,Math.round((hz-O)/STEP)));
       return {type:'boru',dir:'x',jx:ix-1,jy:activeFloor,jz:jz};
     } else if(boruDir==='z'){
-      // merkez X=O+jx*STEP, Y=O+jy*STEP, Z=O+(jz+1)*STEP
       var jx=Math.max(0,Math.min(GRID_N-1,Math.round((hx-O)/STEP)));
       var iz=Math.max(1,Math.min(GRID_N-2,Math.round((hz-O)/STEP)));
       return {type:'boru',dir:'z',jx:jx,jy:activeFloor,jz:iz-1};
     } else {
-      // boruY: merkez Y=O+(jy+1)*STEP → jy=activeFloor-1 → center on floor plane
       var jx=Math.max(0,Math.min(GRID_N-1,Math.round((hx-O)/STEP)));
       var jz=Math.max(0,Math.min(GRID_N-1,Math.round((hz-O)/STEP)));
       return {type:'boru',dir:'y',jx:jx,jy:Math.max(0,activeFloor-1),jz:jz};
@@ -636,7 +694,6 @@ function rayHitFloor(ray){
 
   if(selAxis === 'x'){
     if(araMode){
-      // ARA: X junction'a snap — validasyon yok, serbestçe koy
       var jx_j = Math.max(1, Math.min(GRID_N-2, Math.round((hx - O) / STEP)));
       jx = jx_j - 0.5;
       jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
@@ -647,7 +704,6 @@ function rayHitFloor(ray){
     return {axis:'x', jx:jx, jy:jy, jz:jz};
   } else if(selAxis === 'z'){
     if(araMode){
-      // ARA: Z junction'a snap — validasyon yok, serbestçe koy
       var jz_j = Math.max(1, Math.min(GRID_N-2, Math.round((hz - O) / STEP)));
       jz = jz_j - 0.5;
       jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
@@ -661,7 +717,6 @@ function rayHitFloor(ray){
     jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
     jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
     if(araMode){
-      // ARA: Y ortasına snap — validasyon yok, serbestçe koy
       return {axis:'y', jx:jx, jy:Math.max(0.5, jy-0.5), jz:jz};
     }
     return {axis:'y', jx:jx, jy:jy, jz:jz};
@@ -670,14 +725,13 @@ function rayHitFloor(ray){
     jx = Math.max(0, Math.min(GRID_N-1, Math.round((hx - O) / STEP)));
     jz = Math.max(0, Math.min(GRID_N-1, Math.round((hz - O) / STEP)));
     if(araMode){
-      // ARA: TAVAN ile aynı pozisyon → jy_stored = jy - 0.5
       return {axis:'y', jx:jx, jy:Math.max(0.5, jy-0.5), jz:jz};
     }
     return {axis:'y', jx:jx, jy:jy_taban, jz:jz};
   }
 }
 
-// ── CONNECTOR SAYISI (BOM için)
+// ── CONNECTOR COUNT (for BOM)
 function cCount(jx, jy, jz){
   var n=0;
   if(jx>0        && getX(jx-1, jy, jz)) n++;
@@ -689,7 +743,7 @@ function cCount(jx, jy, jz){
   return n;
 }
 
-// ── THREE.JS NESNELERİ
+// ── THREE.JS
 var scene, camera, renderer;
 var panelGroup, connGroup;
 var hoverMesh, floorGroup;
@@ -700,7 +754,7 @@ function getHoverGeo(axis){
   return hoverGeoCache[axis];
 }
 
-// ── SAHNE KURULUM
+// ── SCENE INIT
 function initThree(){
   var wrap = document.getElementById('viewport');
   scene = new THREE.Scene();
@@ -735,7 +789,6 @@ function initThree(){
     scene.add(new THREE.Line(g2, lmat));
   }
 
-  // Hacimsel kat kutusu — fill + kenar çizgileri
   var slabGeo = new THREE.BoxGeometry(boxSz, STEP, boxSz);
   var slabFill = new THREE.Mesh(slabGeo,
     new THREE.MeshBasicMaterial({color:0x00e5ff, transparent:true, opacity:0.045, depthWrite:false, side:THREE.FrontSide}));
@@ -797,7 +850,6 @@ function rebuild(){
     });
   });
 
-  // ── BORULAR (tek dict, fiziksel konum bazlı)
   Object.entries(boru).forEach(function(e){
     var p=e[0].split('_'), dir=e[1];
     var px=+p[0], py=+p[1], pz=+p[2];
@@ -809,7 +861,6 @@ function rebuild(){
     panelGroup.add(G);
   });
 
-  // ── AUTO BORU-BORU BAĞLANTI HALKASI
   var _bbSet={};
   Object.keys(boru).forEach(function(k){
     var p=k.split('_'), px=+p[0],py=+p[1],pz=+p[2];
@@ -827,17 +878,12 @@ function rebuild(){
     }
   });
 
-  // ── CONNECTOR'LAR — her kenar bağlantısı 2 aynı parça, aralarında 3mm
   var CONN_COL = 0xffd166;
-  var conn_s = 32*(PSZ/110);               // plaka geniş kenar boyu ~31.6mm
-  var conn_gap = 3;                         // iki parça arası boşluk mm
-  // Her offset yönü için doğru yarı-mesafe:
-  //   ince eksen (PT=3mm) boyunca ayrılıyorsa → (PT + gap) / 2 = 3mm
-  //   geniş eksen (s~32mm) boyunca ayrılıyorsa → (s + gap) / 2 ≈ 17.3mm
-  var conn_hT = (PT + conn_gap) / 2;        // ince eksen split = 3mm
-  var conn_hW = (conn_s + conn_gap) / 2;    // geniş eksen split ≈ 17.3mm
+  var conn_s = 32*(PSZ/110);
+  var conn_gap = 3;
+  var conn_hT = (PT + conn_gap) / 2;
+  var conn_hW = (conn_s + conn_gap) / 2;
 
-  // ox/oy/oz: ayrılma yönü — h: o yöndeki yarı-mesafe
   function addConn(px, py, pz, geo, onAct, ox, oy, oz, h){
     var cop = viewMode ? 0.92 : (onAct ? 0.92 : 0.13);
     [+1, -1].forEach(function(sign){
@@ -848,10 +894,8 @@ function rebuild(){
     });
   }
 
-  // Connector pozisyonu — yatay STEP/2, dikey STEP_V/2
-  // Dedup: aynı noktaya birden fazla istek gelirse onAct OR'lanır (aktif kat öncelikli)
-  var SH_H = STEP/2;  // yatay offset = 60mm
-  var SH_V = STEP/2;  // dikey offset = 60mm
+  var SH_H = STEP/2;
+  var SH_V = STEP/2;
   var connMap = {};
   function addConnD(px, py, pz, geo, onAct, ox, oy, oz, h){
     var key = Math.round(px)+'_'+Math.round(py)+'_'+Math.round(pz)+'_'+geo.uuid;
@@ -859,10 +903,9 @@ function rebuild(){
     connMap[key] = {px:px,py:py,pz:pz,geo:geo,onAct:onAct,ox:ox,oy:oy,oz:oz,h:h};
   }
 
-  // DUV-X (face YZ): Z-kenar→cGeoY split-Y(ince), Y-kenar→cGeoZ split-Z(ince)
   Object.keys(sx).forEach(function(k){
     var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
-    if(jx!==Math.floor(jx)) return; // ara panel → connector atla
+    if(jx!==Math.floor(jx)) return;
     var pos=panelPos({axis:'x',jx:jx,jy:jy,jz:jz});
     var onAct=(jy===activeFloor);
     if(getX(jx,jy,jz+1)||getZ(jx,jy,jz)||getZ(jx+1,jy,jz))
@@ -875,10 +918,9 @@ function rebuild(){
       addConnD(pos[0], pos[1]-SH_V, pos[2], cGeoZ(), onAct, 0,0,1, conn_hT);
   });
 
-  // DUV-Z (face XY): X-kenar→cGeoY split-Y(ince), Y-kenar→cGeoX split-X(ince)
   Object.keys(sz).forEach(function(k){
     var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
-    if(jx!==Math.floor(jx)) return; // ara panel → connector atla
+    if(jx!==Math.floor(jx)) return;
     var pos=panelPos({axis:'z',jx:jx,jy:jy,jz:jz});
     var onAct=(jy===activeFloor);
     if(getZ(jx+1,jy,jz)||getX(jx,jy,jz)||getX(jx,jy,jz+1))
@@ -891,10 +933,9 @@ function rebuild(){
       addConnD(pos[0], pos[1]-SH_V, pos[2], cGeoX(), onAct, 1,0,0, conn_hT);
   });
 
-  // TAVAN/TABAN (face XZ): X-kenar→cGeoZ split-Z(ince), Z-kenar→cGeoX split-X(ince)
   Object.keys(sy).forEach(function(k){
     var p=k.split('_'); var jx=+p[0],jy=+p[1],jz=+p[2];
-    if(jx!==Math.floor(jx)||jy!==Math.floor(jy)||jz!==Math.floor(jz)) return; // ara panel → connector atla
+    if(jx!==Math.floor(jx)||jy!==Math.floor(jy)||jz!==Math.floor(jz)) return;
     var pos=panelPos({axis:'y',jx:jx,jy:jy,jz:jz});
     var onAct=(jy===activeFloor||jy===activeFloor-1);
     if(getY(jx+1,jy,jz)||getX(jx,jy,jz)||getX(jx,jy-1,jz))
@@ -907,7 +948,6 @@ function rebuild(){
       addConnD(pos[0], pos[1], pos[2]-SH_H, cGeoX(), onAct, 1,0,0, conn_hT);
   });
 
-  // connMap flush — onAct OR'landıktan sonra çiz
   Object.keys(connMap).forEach(function(k){
     var c=connMap[k]; addConn(c.px,c.py,c.pz,c.geo,c.onAct,c.ox,c.oy,c.oz,c.h);
   });
@@ -919,7 +959,6 @@ function rebuild(){
   autoSave();
 }
 
-// Eşleşmeyen boru varsa uyarı göster, tıklayınca oraya odaklan
 var _warnPos = null;
 function updateBoruWarn(){
   var warn = document.getElementById('boru-warn');
@@ -939,7 +978,7 @@ function updateBoruWarn(){
 
 // ── HOVER
 function updateHover(hit){
-  if(!hit){ hoverMesh.visible=false; setStatus('HAZIR','#484f58','#21262d'); return; }
+  if(!hit){ hoverMesh.visible=false; setStatus('READY','#6e7681','#21262d'); return; }
   hoverMesh.visible = true;
   if(hit.type==='boru'){
     var axKey='boru_'+hit.dir;
@@ -955,8 +994,8 @@ function updateHover(hit){
     var ex=getBoru(hit);
     hoverMesh.material.color.setHex(ex?0xff2222:0x00ffcc);
     hoverMesh.material.opacity=ex?0.55:0.45;
-    var bLabel=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
-    setStatus(ex?'SIL BORU':'KOY '+bLabel,ex?'#ff4444':'#3ddc84',ex?'rgba(255,68,68,.3)':'rgba(61,220,132,.3)');
+    var bLabel=(selType==='kafes_boru'?'K.':'')+'TUBE-'+boruDir.toUpperCase();
+    setStatus(ex?'REMOVE TUBE':'PLACE '+bLabel,ex?'#ff4444':'#3ddc84',ex?'rgba(255,68,68,.3)':'rgba(61,220,132,.3)');
     return;
   }
   var existing = getPanel(hit);
@@ -970,11 +1009,11 @@ function updateHover(hit){
   if(existing){
     hoverMesh.material.color.setHex(0xff2222);
     hoverMesh.material.opacity = 0.65;
-    setStatus('SIL', '#ff4444', 'rgba(255,68,68,.3)');
+    setStatus('REMOVE', '#ff4444', 'rgba(255,68,68,.3)');
   } else {
     hoverMesh.material.color.setHex(0x00ffcc);
     hoverMesh.material.opacity = 0.6;
-    setStatus((araMode?'ARA ':'')+' KOY ['+AXIS_LABEL[selAxis]+']', '#3ddc84', 'rgba(61,220,132,.3)');
+    setStatus((araMode?'MID ':'')+' PLACE ['+AXIS_LABEL[selAxis]+']', '#3ddc84', 'rgba(61,220,132,.3)');
   }
 }
 
@@ -1002,9 +1041,6 @@ function updateBOM(){
       else { var b=t.replace(/\d+$/,''); if(p[b]!==undefined) p[b]++; }
     });
   });
-  for(var jx=0;jx<GRID_N;jx++) for(var jy=0;jy<GRID_N;jy++) for(var jz=0;jz<GRID_N;jz++){
-    var n=cCount(jx,jy,jz); if(n) c[Math.min(n,6)]++;
-  }
   document.getElementById('b-duz').textContent  = p.duz;
   document.getElementById('b-par').textContent  = p.parmaklik;
   document.getElementById('b-yar').textContent  = p.yari;
@@ -1012,21 +1048,23 @@ function updateBOM(){
   document.getElementById('b-tun').textContent  = p.tunel;
   document.getElementById('b-ykap').textContent = p.yari_kapi;
   document.getElementById('b-sul').textContent  = p.suluk;
-  document.getElementById('b-ara').textContent  = araCount;
   document.getElementById('b-bor').textContent  = borCount;
   document.getElementById('b-kbor').textContent = kborCount;
-  document.getElementById('b-c1').textContent   = c[1];
-  document.getElementById('b-c2').textContent   = c[2];
-  document.getElementById('b-c3').textContent   = c[3];
-  document.getElementById('b-c4').textContent   = c[4];
-  document.getElementById('b-c5').textContent   = (c[5]||0)+(c[6]||0);
-  document.getElementById('b-tot').textContent  = p.duz+p.parmaklik+p.yari+p.kapi+p.tunel+p.yari_kapi+p.suluk+araCount;
-  document.getElementById('b-ctot').textContent = c[1]+c[2]+c[3]+c[4]+(c[5]||0)+(c[6]||0);
+  var bbCount=0, _bb={};
+  Object.keys(boru).forEach(function(k){
+    var pt=k.split('_'),px=+pt[0],py=+pt[1],pz=+pt[2], dir=boru[k], nk;
+    if(dir==='x') nk=sk(px+1,py,pz);
+    else if(dir==='z') nk=sk(px,py,pz+1);
+    else nk=sk(px,py+1,pz);
+    if(boru[nk]===dir){ var bk=k+'_'+dir; if(!_bb[bk]){_bb[bk]=1; bbCount++;} }
+  });
+  document.getElementById('b-tot').textContent   = p.duz+p.parmaklik+p.yari+p.kapi+p.tunel+p.yari_kapi+p.suluk+araCount;
+  document.getElementById('b-ctot').textContent  = connGroup ? connGroup.children.length : 0;
+  document.getElementById('b-bhalka').textContent = bbCount;
 }
 
-// ── KAMERA
+// ── CAMERA
 var theta=0.55, phi=1.05, radius=200;
-// camTgt: eski radius=4800 overview pozisyonunu koru (camera.pos = camTgt + sph(200))
 var camTgt = new THREE.Vector3(2085, 2286, 3401);
 
 function camUpdate(){
@@ -1061,7 +1099,7 @@ function setView(name){
   camTgt.set(0, 0, 0); camUpdate();
 }
 
-// ── KAT + SMOOTH ANİMASYON
+// ── FLOOR ANIMATION
 var _floorAnimId = null;
 function animFloor(){
   var target = off() + activeFloor*STEP;
@@ -1073,7 +1111,7 @@ function animFloor(){
 }
 function setFloor(f){
   activeFloor = Math.max(1, Math.min(GRID_N-1, f));
-  var d = activeFloor - 1;  // görsel: 0,1,2,... (min=1 iç, min=0 görsel)
+  var d = activeFloor - 1;
   document.getElementById('fl-num').textContent = d;
   document.getElementById('io-floor').textContent = d;
   rebuild();
@@ -1087,7 +1125,7 @@ function focusFloor(){
   camUpdate();
 }
 
-// ── YÖN
+// ── DIRECTION
 function setAxis(ax){
   selAxis = ax;
   document.querySelectorAll('.axbtn').forEach(function(b){
@@ -1096,48 +1134,50 @@ function setAxis(ax){
   document.getElementById('io-axis').textContent = AXIS_LABEL[ax];
 }
 
-// ── ARA PANEL MODU
+// ── MID MODE
 function toggleAra(){
   araMode = !araMode;
   var btn = document.getElementById('btn-ara');
   var ov  = document.getElementById('io-ara');
   if(araMode){
     btn.style.color = '#ff6b35'; btn.style.borderColor = '#ff6b35';
-    btn.textContent = 'ARA MOD: AÇIK  ( M )';
-    ov.style.color = '#ff6b35'; ov.textContent = 'ARA:ON';
+    btn.textContent = 'MID MODE: ON  ( M )';
+    ov.style.color = '#ff6b35'; ov.textContent = 'MID:ON';
   } else {
-    btn.style.color = '#484f58'; btn.style.borderColor = '';
-    btn.textContent = 'ARA MOD: KAPALI  ( M )';
-    ov.style.color = '#484f58'; ov.textContent = 'ARA:OFF';
+    btn.style.color = '#6e7681'; btn.style.borderColor = '';
+    btn.textContent = 'MID MODE: OFF  ( M )';
+    ov.style.color = '#6e7681'; ov.textContent = 'MID:OFF';
   }
 }
 
-// ── FLY MODE (F modunda FPS tarzı uçuş)
+// ── FLY MODE
 var flyKeys = {};
 var _flyId  = null;
 var FLY_SPD = 25;
 var _fwd = new THREE.Vector3(), _rgt = new THREE.Vector3(), _up = new THREE.Vector3(0,1,0);
 var _savedRadius = null;
-var FLY_RADIUS = 200;  // fly modda kamera ile hedef arası mesafe
+var FLY_RADIUS = 200;
 
 function flyStep(){
   if(_flyId === null){ return; }
   var moved = false;
-  // İleri yönü theta/phi'den hesapla — radius'tan bağımsız
   _fwd.set(Math.sin(phi)*Math.sin(theta), Math.cos(phi), Math.sin(phi)*Math.cos(theta));
   _rgt.crossVectors(_fwd, _up).normalize();
   var s = FLY_SPD;
-  if(flyKeys['w']||flyKeys['W']){ camTgt.addScaledVector(_fwd, -s); moved=true; }
-  if(flyKeys['s']||flyKeys['S']){ camTgt.addScaledVector(_fwd,  s); moved=true; }
-  if(flyKeys['a']||flyKeys['A']){ camTgt.addScaledVector(_rgt,  s); moved=true; }
-  if(flyKeys['d']||flyKeys['D']){ camTgt.addScaledVector(_rgt, -s); moved=true; }
-  if(flyKeys[' '])               { camTgt.y -= s; moved=true; }
-  if(flyKeys['Shift'])           { camTgt.y += s; moved=true; }
-  if(moved) camUpdate();
+  if(flyKeys['w']||flyKeys['W']){ camera.position.addScaledVector(_fwd, -s); moved=true; }
+  if(flyKeys['s']||flyKeys['S']){ camera.position.addScaledVector(_fwd,  s); moved=true; }
+  if(flyKeys['a']||flyKeys['A']){ camera.position.addScaledVector(_rgt,  s); moved=true; }
+  if(flyKeys['d']||flyKeys['D']){ camera.position.addScaledVector(_rgt, -s); moved=true; }
+  if(flyKeys[' '])               { camera.position.y -= s; moved=true; }
+  if(flyKeys['Shift'])           { camera.position.y += s; moved=true; }
+  if(moved){
+    camTgt.copy(camera.position).addScaledVector(_fwd, -radius);
+    camUpdate();
+  }
   _flyId = requestAnimationFrame(flyStep);
 }
 
-// ── İZLEME MODU
+// ── VIEW MODE
 function toggleView(){
   viewMode = !viewMode;
   document.getElementById('sidebar').style.display      = viewMode ? 'none'  : 'flex';
@@ -1157,6 +1197,7 @@ function toggleView(){
 
 // ── INPUT
 var rDrag=false, rpx=0, rpy=0;
+var rCamPos = new THREE.Vector3();
 var pDrag=false, ppx=0, ppy=0;
 var clickDown=false, clickSx=0, clickSy=0;
 var rc = new THREE.Raycaster(), msVec = new THREE.Vector2();
@@ -1170,7 +1211,7 @@ function setMouse(e){
 
 function initEvents(){
   renderer.domElement.addEventListener('mousedown', function(e){
-    if(e.button===2){ rDrag=true; rpx=e.clientX; rpy=e.clientY; e.preventDefault(); }
+    if(e.button===2){ rDrag=true; rpx=e.clientX; rpy=e.clientY; rCamPos.copy(camera.position); e.preventDefault(); }
     if(e.button===1){ pDrag=true; ppx=e.clientX; ppy=e.clientY; e.preventDefault(); }
     if(e.button===0){ clickDown=true; clickSx=e.clientX; clickSy=e.clientY; }
   }, false);
@@ -1181,7 +1222,12 @@ function initEvents(){
     if(rDrag){
       theta -= (e.clientX-rpx)*0.008;
       phi = Math.max(.06, Math.min(Math.PI-.06, phi-(e.clientY-rpy)*0.008));
-      rpx=e.clientX; rpy=e.clientY; camUpdate(); return;
+      rpx=e.clientX; rpy=e.clientY;
+      var lx = -Math.sin(phi)*Math.sin(theta);
+      var ly = -Math.cos(phi);
+      var lz = -Math.sin(phi)*Math.cos(theta);
+      camTgt.set(camera.position.x + lx*radius, camera.position.y + ly*radius, camera.position.z + lz*radius);
+      camUpdate(); return;
     }
     if(pDrag){
       doPan(e.clientX-ppx, e.clientY-ppy);
@@ -1220,8 +1266,14 @@ function initEvents(){
     }
   });
 
-  // Scroll wheel kaldırıldı — WASD ile çakışıyordu
-  renderer.domElement.addEventListener('wheel', function(e){ e.preventDefault(); }, {passive:false});
+  renderer.domElement.addEventListener('wheel', function(e){
+    e.preventDefault();
+    var fwd = new THREE.Vector3(-Math.sin(phi)*Math.sin(theta), -Math.cos(phi), -Math.sin(phi)*Math.cos(theta));
+    var s = Math.sign(e.deltaY) * FLY_SPD * 8;
+    camera.position.addScaledVector(fwd, -s);
+    camTgt.copy(camera.position).addScaledVector(fwd, radius);
+    camUpdate();
+  }, {passive:false});
 
   window.addEventListener('resize', function(){
     var wrap = document.getElementById('viewport');
@@ -1239,7 +1291,7 @@ function initEvents(){
       if(selType==='kafes_boru'){ selBoruStyle='kafes_boru'; selType='kafes_boru'; }
       else if(selType==='boru'){ selBoruStyle='boru'; }
       document.getElementById('io-type').textContent = TYPE_LABEL[selType]||selType.toUpperCase();
-      if(selType==='boru'||selType==='kafes_boru') document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
+      if(selType==='boru'||selType==='kafes_boru') document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'TUBE-'+boruDir.toUpperCase();
       else setAxis(selAxis);
     });
   });
@@ -1256,7 +1308,7 @@ function initEvents(){
   document.getElementById('fl-dn').onclick = function(){ setFloor(activeFloor-1); };
 
   document.getElementById('btn-clear').onclick = function(){
-    if(!confirm('Tum panelleri sil?')) return;
+    if(!confirm('Clear all panels?')) return;
     sx={}; sy={}; sz={}; sxClr={}; syClr={}; szClr={}; boru={}; boruClr={}; boruStyle={};
     rebuild(); currentHit=null; updateHover(null); camUpdate();
   };
@@ -1264,10 +1316,10 @@ function initEvents(){
   document.getElementById('btn-ara').addEventListener('click', toggleAra);
 
   window.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){ document.getElementById('guide-overlay').classList.remove('open'); return; }
     if(e.key==='f'||e.key==='F'){ toggleView(); return; }
     if(e.key==='c'||e.key==='C'){ focusFloor(); return; }
     if(e.key==='m'||e.key==='M'){ toggleAra(); return; }
-    // Fly tuşları — her zaman aktif (edit + izleme)
     if(['w','W','a','A','s','S','d','D','Shift'].indexOf(e.key)!==-1){
       e.preventDefault(); flyKeys[e.key]=true; return;
     }
@@ -1276,7 +1328,7 @@ function initEvents(){
     if(e.key==='r'||e.key==='R'){
       if(selType==='boru'||selType==='kafes_boru'){
         var bd=['x','z','y']; boruDir=bd[(bd.indexOf(boruDir)+1)%3];
-        document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'BORU-'+boruDir.toUpperCase();
+        document.getElementById('io-axis').textContent=(selType==='kafes_boru'?'K.':'')+'TUBE-'+boruDir.toUpperCase();
         rc.setFromCamera(msVec, camera);
         currentHit = rayHitFloor(rc.ray);
         updateHover(currentHit);
@@ -1336,7 +1388,7 @@ function initResizer(){
   });
 }
 
-// ── RENK PALETİ KURULUM
+// ── COLOR PALETTE
 function initColorPalette(){
   var pal = document.getElementById('cpal');
   FILAMENT.forEach(function(f){
@@ -1360,14 +1412,13 @@ function initColorPalette(){
     document.getElementById('custom-col-input').click();
   });
   document.getElementById('custom-col-input').addEventListener('input', function(e){
-    var hex = e.target.value; // "#rrggbb"
+    var hex = e.target.value;
     var int = parseInt(hex.replace('#',''), 16);
     selColor = int;
-    // geçici swatch güncelle veya ekle
     var existing = pal.querySelector('.csw[data-col="custom"]');
     if(!existing){
       var sw = document.createElement('div');
-      sw.className = 'csw'; sw.dataset.col = 'custom'; sw.title = 'Özel';
+      sw.className = 'csw'; sw.dataset.col = 'custom'; sw.title = 'Custom';
       pal.appendChild(sw); existing = sw;
     }
     existing.style.background = hex;
@@ -1377,7 +1428,7 @@ function initColorPalette(){
   });
 }
 
-// ── KAYDET / YÜKLE
+// ── SAVE / LOAD
 var LS_KEY = 'habitatforge_v3_autosave';
 
 function saveDesign(){
@@ -1398,7 +1449,7 @@ function saveDesign(){
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  setStatus('KAYDEDİLDİ', '#6699ff', 'rgba(102,153,255,.4)');
+  setStatus('SAVED', '#6699ff', 'rgba(102,153,255,.4)');
 }
 
 function loadDesign(file){
@@ -1410,9 +1461,9 @@ function loadDesign(file){
       sxClr=d.sxClr||{}; syClr=d.syClr||{}; szClr=d.szClr||{};
       boru=d.boru||{}; boruClr=d.boruClr||{}; boruStyle=d.boruStyle||{};
       setFloor(d.activeFloor !== undefined ? d.activeFloor : 1);
-      setStatus('YÜKLENDİ', '#6699ff', 'rgba(102,153,255,.4)');
+      setStatus('LOADED', '#6699ff', 'rgba(102,153,255,.4)');
     } catch(ex) {
-      setStatus('HATA: GEÇERSİZ DOSYA', '#ef476f', 'rgba(239,71,111,.3)');
+      setStatus('ERROR: INVALID FILE', '#ef476f', 'rgba(239,71,111,.3)');
     }
   };
   reader.readAsText(file);
@@ -1441,7 +1492,7 @@ function autoLoad(){
   } catch(ex){ return false; }
 }
 
-// ── BAŞLAT
+// ── INIT
 initThree();
 panelGroup = new THREE.Group(); connGroup = new THREE.Group();
 scene.add(panelGroup); scene.add(connGroup);
